@@ -11,6 +11,14 @@ class SigninUsecaseImp implements ISigninUsecase {
 
   @override
   Future<Either<AppException, UserEntity>> call(String email, String password) async {
+    if (email.isEmpty) {
+      return Left(AppException(error: 'Please type a valid email!'));
+    }
+
+    if (password.isEmpty) {
+      return Left(AppException(error: 'Please type your password!'));
+    }
+
     return await _repository(email, password);
   }
 }

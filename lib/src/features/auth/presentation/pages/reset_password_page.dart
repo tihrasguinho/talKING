@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:talking/src/core/widgets/app_loader.dart';
-import 'package:talking/src/features/auth/presentation/controllers/signin_controller.dart';
+import 'package:talking/src/features/auth/presentation/controllers/reset_password_controller.dart';
 
-class SigninPage extends StatefulWidget {
-  const SigninPage({Key? key}) : super(key: key);
+class ResetPasswordPage extends StatefulWidget {
+  const ResetPasswordPage({Key? key}) : super(key: key);
 
   @override
-  State<SigninPage> createState() => _SigninPageState();
+  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
 }
 
-class _SigninPageState extends State<SigninPage> {
-  final SigninController controller = Modular.get();
+class _ResetPasswordPageState extends State<ResetPasswordPage> {
+  final ResetPasswordController controller = Modular.get();
 
   final email = TextEditingController();
-  final password = TextEditingController();
 
   bool loading = false;
 
@@ -27,7 +26,6 @@ class _SigninPageState extends State<SigninPage> {
   @override
   void dispose() {
     email.dispose();
-    password.dispose();
     super.dispose();
   }
 
@@ -36,6 +34,8 @@ class _SigninPageState extends State<SigninPage> {
     return AppLoader(
       loading: loading,
       child: Scaffold(
+        appBar: AppBar(),
+        extendBodyBehindAppBar: true,
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,8 +43,8 @@ class _SigninPageState extends State<SigninPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: Text(
-                'talKING',
-                style: Theme.of(context).textTheme.headline3!.copyWith(
+                'Reset Password',
+                style: Theme.of(context).textTheme.headline4!.copyWith(
                       color: Theme.of(context).hintColor,
                     ),
               ),
@@ -52,7 +52,7 @@ class _SigninPageState extends State<SigninPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: Text(
-                'chat everywhere',
+                'a link will be sent to your email',
                 style: Theme.of(context).textTheme.overline!.copyWith(
                       color: Theme.of(context).hintColor,
                     ),
@@ -77,42 +77,11 @@ class _SigninPageState extends State<SigninPage> {
             const SizedBox(height: 16.0),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30.0),
-              child: TextField(
-                controller: password,
-                style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                      color: Theme.of(context).hintColor,
-                    ),
-                obscureText: true,
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
-                  filled: false,
-                  labelText: 'Password',
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                child: TextButton(
-                  onPressed: () => Modular.to.pushNamed('/reset-password'),
-                  child: Text(
-                    'FORGOT YOUR PASSWORD?',
-                    style: Theme.of(context).textTheme.overline!.copyWith(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: InkWell(
                 onTap: () async {
                   setLoading(true);
 
-                  await controller.signIn(email.text, password.text);
+                  await controller.resetPassword(email.text);
 
                   setLoading(false);
                 },
@@ -134,26 +103,11 @@ class _SigninPageState extends State<SigninPage> {
                   ),
                   child: Center(
                     child: Text(
-                      'Sign In',
+                      'Reset',
                       style: Theme.of(context).textTheme.button!.copyWith(
                             color: Colors.white,
                           ),
                     ),
-                  ),
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                child: TextButton(
-                  onPressed: () => Modular.to.pushNamed('/signup'),
-                  child: Text(
-                    "DON'T HAVE AN ACCOUNT? SIGN UP HERE! ",
-                    style: Theme.of(context).textTheme.overline!.copyWith(
-                          color: Theme.of(context).primaryColor,
-                        ),
                   ),
                 ),
               ),
