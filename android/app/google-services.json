@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "975167234645",
+    "project_id": "talking-dev",
+    "storage_bucket": "talking-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:975167234645:android:a1f21cef8d9c9fe3fd6adc",
+        "android_client_info": {
+          "package_name": "dev.tihrasguinho.talking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "975167234645-2jci6aolca45a53vth3oegcqh7f8nlh1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAacpJ7E9sdTZSpTC4a9gOOSMf57DjAgAo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "975167234645-2jci6aolca45a53vth3oegcqh7f8nlh1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

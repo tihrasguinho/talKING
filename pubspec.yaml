@@ -1,0 +1,34 @@
+name: talking
+description: A new Flutter project.
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.17.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  firebase_core: ^1.17.0
+  firebase_auth: ^3.3.18
+  cloud_firestore: ^3.1.15
+  firebase_storage: ^10.2.16
+  bloc: ^8.0.3
+  flutter_bloc: ^8.0.1
+  flutter_modular: ^5.0.2
+  flex_color_scheme: ^5.0.1
+  google_fonts: ^2.3.3
+  dartz: ^0.10.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
