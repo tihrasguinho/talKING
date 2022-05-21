@@ -110,6 +110,8 @@ class _SigninPageState extends State<SigninPage> {
               padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: InkWell(
                 onTap: () async {
+                  FocusScope.of(context).unfocus();
+
                   setLoading(true);
 
                   await controller.signIn(email.text, password.text);

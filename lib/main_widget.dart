@@ -11,18 +11,22 @@ class MainWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Modular.setNavigatorKey(navigatorKey);
+    Modular.setInitialRoute('/home');
 
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       title: 'talKING',
       routeInformationParser: Modular.routeInformationParser,
       routerDelegate: Modular.routerDelegate,
       theme: FlexThemeData.dark(
         colorScheme: AppConsts.flexSchemeDark,
         textTheme: GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme),
+        appBarBackground: const Color(0xFF242424),
       ),
       darkTheme: FlexThemeData.dark(
         colorScheme: AppConsts.flexSchemeDark,
         textTheme: GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme),
+        appBarBackground: const Color(0xFF242424),
       ),
       themeMode: ThemeMode.dark,
     );

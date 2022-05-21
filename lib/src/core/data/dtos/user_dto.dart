@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:talking/src/features/auth/domain/entities/user_entity.dart';
+import 'package:talking/src/core/domain/entities/user_entity.dart';
 
 extension UserDto on UserEntity {
   static UserEntity fromMap(Map data) {

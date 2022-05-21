@@ -101,6 +101,7 @@ class _SignupPageState extends State<SignupPage> {
               padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: TextField(
                 controller: email,
+                keyboardType: TextInputType.emailAddress,
                 style: Theme.of(context).textTheme.subtitle1!.copyWith(
                       color: Theme.of(context).hintColor,
                     ),
@@ -134,6 +135,8 @@ class _SignupPageState extends State<SignupPage> {
               padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: InkWell(
                 onTap: () async {
+                  FocusScope.of(context).unfocus();
+
                   setLoading(true);
 
                   await controller.signUp(

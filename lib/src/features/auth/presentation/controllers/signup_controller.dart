@@ -1,7 +1,8 @@
 import 'dart:developer';
 
 import 'package:talking/src/core/others/app_exception.dart';
-import 'package:talking/src/features/auth/domain/entities/user_entity.dart';
+import 'package:talking/src/core/domain/entities/user_entity.dart';
+import 'package:talking/src/core/others/app_snackbars.dart';
 import 'package:talking/src/features/auth/domain/usecases/signup_usecase/signup_usecase.dart';
 
 class SignupController {
@@ -20,6 +21,8 @@ class SignupController {
       final exception = result.fold((l) => l, (r) => null) as AppException;
 
       log(exception.error, name: 'signUpError');
+
+      AppSnackbars.error(exception.error);
     }
   }
 }

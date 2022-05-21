@@ -22,23 +22,26 @@ class AppLoader extends StatelessWidget {
           return true;
         }
       },
-      child: Stack(
-        children: [
-          Positioned.fill(child: child),
-          Positioned.fill(
-            child: loading
-                ? BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                    child: Container(
-                      color: Colors.black12,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Stack(
+          children: [
+            Positioned.fill(child: child),
+            Positioned.fill(
+              child: loading
+                  ? BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                      child: Container(
+                        color: Colors.black12,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
                       ),
-                    ),
-                  )
-                : const SizedBox(),
-          ),
-        ],
+                    )
+                  : const SizedBox(),
+            ),
+          ],
+        ),
       ),
     );
   }
