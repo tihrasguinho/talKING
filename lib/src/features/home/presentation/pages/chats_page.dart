@@ -14,6 +14,17 @@ class _ChatsPageState extends State<ChatsPage> {
       appBar: AppBar(
         title: const Text('Chats'),
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => showModalBottomSheet(
+      //     context: context,
+      //     builder: (context) {
+      //       return Column(
+      //         children: [],
+      //       );
+      //     },
+      //   ),
+      //   child: const Icon(Icons.add_rounded),
+      // ),
     );
   }
 }

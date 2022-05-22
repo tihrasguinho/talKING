@@ -1,8 +1,8 @@
 import 'dart:developer';
 
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:talking/src/core/others/app_exception.dart';
 import 'package:talking/src/features/home/data/datasources/send_friend_request_datasource/send_friend_request_datasource.dart';
 
@@ -11,7 +11,7 @@ class SendFriendRequestFirebaseDatasourceImp implements ISendFriendRequestDataso
   Future<Either<AppException, String>> call(String friendUid) async {
     try {
       final auth = FirebaseAuth.instance;
-      final functions = FirebaseFunctions.instance;
+      final firestore = FirebaseFirestore.instance;
 
       final userUid = auth.currentUser?.uid;
 
@@ -20,12 +20,27 @@ class SendFriendRequestFirebaseDatasourceImp implements ISendFriendRequestDataso
       }
 
       final data = <String, dynamic>{
-        'uid': friendUid,
+        'from': userUid,
+        'to': friendUid,
+        'created_at': Timestamp.now(),
+        'updated_at': Timestamp.now(),
+        'status': 'awaiting',
       };
 
-      final callable = await functions.httpsCallable('friendRequest').call(data);
+      final query = await firestore
+          .collection('cl_requests')
+          .where('from', isEqualTo: userUid)
+          .where('to', isEqualTo: friendUid)
+          .orderBy('created_at')
+          .get();
 
-      return Right(callable.data['message']);
+      if (query.size > 0) {
+        return Left(AppException(error: 'The friend request has already been sent!'));
+      }
+
+      await firestore.collection('cl_requests').add(data);
+
+      return const Right('Friend request sent successfully!');
     } on FirebaseException catch (e) {
       log(e.code);
 

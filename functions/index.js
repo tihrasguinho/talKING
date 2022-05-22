@@ -3,155 +3,88 @@ const admin = require('firebase-admin');
 
 admin.initializeApp();
 
-exports.responseFriendRequest = functions.https.onCall(async (data, context) => {
-    const id = data.id;
-    const accepted = data.accepted;
+const firestore = admin.firestore();
 
-    const userUid = context.auth.uid;
+const messaging = admin.messaging();
 
-    if (!userUid) {
-        return {
-            message: 'User is not logged in!'
+exports.notifyFriendRequest = functions.firestore.document('cl_requests/{docId}').onCreate(async (snapshot, context) => {
+    const snap = snapshot.data();
+
+    const to = (await firestore.collection('cl_users').doc(snap.to).get()).data();
+
+    if (to.token !== '') {
+
+        const from = (await firestore.collection('cl_users').doc(snap.from).get()).data();
+
+        const notification = {
+            title: 'Friend Request',
+            body: `${from.name} sent you a friend request!`
         };
-    }
 
-    const doc = await admin.firestore().collection('cl_requests').doc(id).get();
-
-    if (doc.exists) {
-        const docData = doc.data();
-
-        if (accepted === true) {
-
-            const from = await admin.firestore().collection('cl_users').doc(docData.from).get();
-
-            const to = await admin.firestore().collection('cl_users').doc(docData.to).get();
-
-            const created_at = admin.firestore.FieldValue.serverTimestamp();
-
-            await admin.firestore()
-                .collection('cl_users')
-                .doc(from.id)
-                .collection('cl_friends')
-                .doc(to.id)
-                .set({ created_at });
-
-            await admin.firestore()
-                .collection('cl_users')
-                .doc(to.id)
-                .collection('cl_friends')
-                .doc(from.id)
-                .set({ created_at });
-
-            const fromData = from.data();
-
-            if (String(fromData.token).length > 0) {
-
-                const toData = to.data();
-
-                const notification = {
-                    title: 'Friend Request Accepted',
-                    body: `${toData.name} accepted your friend request!`,
-                };
-
-                const message = {
-                    notification,
-                    data: {
-                        sender: to.id,
-                        title: 'Friend Request Accepted',
-                        body: `${toData.name} accepted your friend request!`,
-                    },
-                };
-
-                await admin.messaging().sendToDevice(
-                    fromData.token,
-                    message,
-                    {
-                        contentAvailable: true,
-                        priority: 'high'
-                    },
-                );
-
-            }
-
-        } 
-
-        await admin.firestore().collection('cl_requests').doc(id).delete();
-
-        return {
-            message: 'Done!'
+        const data = {
+            sender: snap.from,
+            time: JSON.stringify(snap.created_at)
         };
+
+        const message = {
+            notification,
+            data,
+        };
+
+        await messaging.sendToDevice(
+            to.token,
+            message,
+            {
+                contentAvailable: true,
+                priority: 'high'
+            },
+        );
 
     }
 });
 
-exports.friendRequest = functions.https.onCall(async (data, context) => {
-    const friendUid = data.uid;
-    const userUid = context.auth.uid;
+exports.notifyFriendRequestResponse = functions.firestore.document('cl_requests/{docId}').onUpdate(async (snapshot, context) => {
+    const after = snapshot.after.data();
 
-    if (!userUid) {
-        return {
-            message: 'User is not logged in!'
-        };
-    }
+    if (after.status === 'accepted') {
 
-    if (friendUid) {
+        const from = (await firestore.collection('cl_users').doc(after.from).get()).data();
 
-        const doc = await admin.firestore()
-            .collection('cl_requests')
-            .where('from', '==', userUid)
-            .where('to', '==', friendUid)
-            .get();
+        await firestore.collection('cl_users').doc(after.from).collection('cl_friends').doc(after.to).set({ created_at: after.updated_at });
 
-        if (doc.size > 0) {
-            return {
-                message: 'Friend request already exists!'
+        await firestore.collection('cl_users').doc(after.to).collection('cl_friends').doc(after.from).set({ created_at: after.updated_at });
+
+        if (from.token !== '') {
+
+            const to = (await firestore.collection('cl_users').doc(after.to).get()).data();
+
+            const notification = {
+                title: 'Friend Accepted',
+                body: `${to.name} accepted your friend request!`
             };
-        }
 
-        const document = {
-            from: userUid,
-            to: friendUid,
-            created_at: admin.firestore.FieldValue.serverTimestamp(),
-        };
+            const data = {
+                sender: after.to,
+                time: JSON.stringify(after.updated_at)
+            };
 
-        await admin.firestore().collection('cl_requests').add(document);
+            const message = {
+                notification,
+                data,
+            };
 
-        const query = await admin.firestore().collection('cl_users').doc(friendUid).get();
-
-        if (query.exists) {
-            const friendData = query.data();
-
-            if (String(friendData.token).length > 0) {
-
-                const notification = {
-                    title: 'Friend Request',
-                    body: `${friendData.name} wants to be your friend!`,
-                };
-
-                const message = {
-                    notification,
-                    data: {
-                        sender: userUid,
-                        title: 'Friend Request',
-                        body: `${friendData.name} wants to be your friend!`,
-                    },
-                };
-
-                await admin.messaging().sendToDevice(
-                    friendData.token,
-                    message,
-                    {
-                        contentAvailable: true,
-                        priority: 'high'
-                    },
-                );
-
-            }
+            await messaging.sendToDevice(
+                from.token,
+                message,
+                {
+                    contentAvailable: true,
+                    priority: 'high'
+                },
+            );
 
         }
+
     }
 
-    return {
-        message: 'Friend request sent successfully!'
-    };
+    await firestore.collection('cl_requests').doc(context.params.docId).delete();
 });
