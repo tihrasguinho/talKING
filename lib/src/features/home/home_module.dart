@@ -3,14 +3,20 @@ import 'package:talking/src/features/home/data/datasources/get_current_user_data
 import 'package:talking/src/features/home/data/datasources/get_current_user_datasource/get_current_user_firebase_datasource_imp.dart';
 import 'package:talking/src/features/home/data/datasources/search_users_datasource/search_users_datasource.dart';
 import 'package:talking/src/features/home/data/datasources/search_users_datasource/search_users_firebase_datasource_imp.dart';
+import 'package:talking/src/features/home/data/datasources/send_friend_request_datasource/send_friend_request_datasource.dart';
+import 'package:talking/src/features/home/data/datasources/send_friend_request_datasource/send_friend_request_firebase_datasource_imp.dart';
 import 'package:talking/src/features/home/data/repositories/get_current_user_repository_imp.dart';
 import 'package:talking/src/features/home/data/repositories/search_users_repository_imp.dart';
+import 'package:talking/src/features/home/data/repositories/send_friend_request_repository_imp.dart';
 import 'package:talking/src/features/home/domain/repositories/get_current_user_repository.dart';
 import 'package:talking/src/features/home/domain/repositories/search_users_repository.dart';
+import 'package:talking/src/features/home/domain/repositories/send_friend_request_repository.dart';
 import 'package:talking/src/features/home/domain/usecases/get_current_user_usecase/get_current_user_usecase.dart';
 import 'package:talking/src/features/home/domain/usecases/get_current_user_usecase/get_current_user_usecase_imp.dart';
 import 'package:talking/src/features/home/domain/usecases/search_users_usecase/search_users_usecase.dart';
 import 'package:talking/src/features/home/domain/usecases/search_users_usecase/search_users_usecase_imp.dart';
+import 'package:talking/src/features/home/domain/usecases/send_friend_request_usecase/send_friend_request_usecase.dart';
+import 'package:talking/src/features/home/domain/usecases/send_friend_request_usecase/send_friend_request_usecase_imp.dart';
 import 'package:talking/src/features/home/presentation/blocs/search/search_bloc.dart';
 import 'package:talking/src/features/home/presentation/controllers/profile_controller.dart';
 import 'package:talking/src/features/home/presentation/controllers/search_controller.dart';
@@ -37,7 +43,14 @@ class HomeModule extends Module {
         Bind.lazySingleton<ISearchUsersRepository>((i) => SearchUsersRepositoryImp(i())),
         Bind.lazySingleton<ISearchUsersUsecase>((i) => SearchUsersUsecaseImp(i())),
         Bind.factory<SearchBloc>((i) => SearchBloc(i())),
-        Bind.factory<SearchController>((i) => SearchController()),
+
+        // Friend Request
+
+        Bind.lazySingleton<ISendFriendRequestDatasource>((i) => SendFriendRequestFirebaseDatasourceImp()),
+        Bind.lazySingleton<ISendFriendRequestRepository>((i) => SendFriendRequestRepositoryImp(i())),
+        Bind.lazySingleton<ISendFriendRequestUsecase>((i) => SendFriendRequestUsecaseImp(i())),
+
+        Bind.factory<SearchController>((i) => SearchController(i())),
       ];
 
   @override

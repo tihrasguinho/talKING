@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:talking/src/core/data/dtos/user_dto.dart';
 import 'package:talking/src/core/domain/entities/user_entity.dart';
+import 'package:talking/src/core/others/app_consts.dart';
 import 'package:talking/src/core/others/app_exception.dart';
 import 'package:talking/src/features/auth/data/datasources/signin_datasource/signin_datasource.dart';
 
@@ -12,12 +15,21 @@ class SigninFirebaseDatasourceImp implements ISigninDatasource {
     try {
       final auth = FirebaseAuth.instance;
       final firestore = FirebaseFirestore.instance;
+      final messaging = FirebaseMessaging.instance;
 
       final credential = await auth.signInWithEmailAndPassword(email: email, password: password);
 
       final query = await firestore.collection('cl_users').doc(credential.user!.uid).get();
 
       if (query.exists) {
+        final token = await messaging.getToken(vapidKey: kIsWeb ? AppConsts.vapidKey : null);
+
+        await firestore.collection('cl_users').doc(credential.user!.uid).update({
+          'token': token,
+          'last_connection': Timestamp.now(),
+          'updated_at': Timestamp.now(),
+        });
+
         return Right(UserDto.fromFirestore(query));
       } else {
         return Left(AppException(error: 'Fail to sign in, try again later!'));

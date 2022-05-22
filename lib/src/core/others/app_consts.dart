@@ -31,4 +31,6 @@ class AppConsts {
     inversePrimary: Color(0xff2f3342),
     shadow: Color(0xff000000),
   );
+
+  static const vapidKey = 'BFP5lZeZaAmK_SmC10Ji_Tfi9dVG1gzdp4vTFFzXv1Z2kFrF-JFsbuqgryqnUuGpQChIZczvkION17E34wsrOgA';
 }

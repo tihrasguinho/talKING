@@ -5,6 +5,7 @@ import 'package:talking/src/core/widgets/custom_circle_avatar.dart';
 import 'package:talking/src/features/home/presentation/blocs/search/search_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/search/search_event.dart';
 import 'package:talking/src/features/home/presentation/blocs/search/search_state.dart';
+import 'package:talking/src/features/home/presentation/controllers/search_controller.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -15,8 +16,9 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final SearchBloc bloc = Modular.get();
+  final SearchController controller = Modular.get();
 
-  final controller = TextEditingController();
+  final input = TextEditingController();
 
   bool searching = false;
 
@@ -34,18 +36,18 @@ class _SearchPageState extends State<SearchPage> {
     bloc.add(FetchSearchEvent(''));
 
     // Listen to changes on textField and calls BloC
-    controller.addListener(() {
-      setSearching(controller.text.isNotEmpty);
+    input.addListener(() {
+      setSearching(input.text.isNotEmpty);
 
-      if (controller.text.length > 3) {
-        bloc.add(FetchSearchEvent(controller.text));
+      if (input.text.length > 3) {
+        bloc.add(FetchSearchEvent(input.text));
       }
     });
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    input.dispose();
     super.dispose();
   }
 
@@ -58,7 +60,7 @@ class _SearchPageState extends State<SearchPage> {
           onPressed: () => searching
               ? {
                   bloc.add(ClearSearchEvent()),
-                  controller.clear(),
+                  input.clear(),
                 }
               : Modular.to.pop(),
           icon: Icon(
@@ -66,7 +68,7 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
         title: TextField(
-          controller: controller,
+          controller: input,
           cursorColor: Colors.white,
           style: Theme.of(context).textTheme.subtitle1!.copyWith(
                 color: Colors.white,
@@ -121,6 +123,10 @@ class _SearchPageState extends State<SearchPage> {
                     leading: CustomCircleAvatar(
                       user: user,
                       size: const Size(52, 52),
+                    ),
+                    trailing: IconButton(
+                      onPressed: () => controller.sendFriendRequest(user.uid),
+                      icon: const Icon(Icons.person_add_rounded),
                     ),
                   ),
                 );

@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "Android Emulador",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "deviceId": "emulator-5554"
+        },
+        {
+            "name": "Android Emulador 2",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "deviceId": "emulator-5556"
+        },
+        {
+            "name": "Android Fisico",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "deviceId": "9dac8c6d"
+        }
+    ]
+}
