@@ -58,7 +58,10 @@ class _FriendsPageState extends State<FriendsPage> {
                   ),
                   leading: CustomCircleAvatar(user: user),
                   trailing: IconButton(
-                    onPressed: () {},
+                    onPressed: () => {
+                      Modular.to.pop(),
+                      Modular.to.pushNamed('/conversation', arguments: user),
+                    },
                     icon: Transform.rotate(
                       angle: -0.5,
                       child: const Icon(Icons.send_rounded),

@@ -3,30 +3,45 @@ import 'package:talking/src/features/home/data/datasources/get_current_user_data
 import 'package:talking/src/features/home/data/datasources/get_current_user_datasource/get_current_user_firebase_datasource_imp.dart';
 import 'package:talking/src/features/home/data/datasources/get_friends_datasource/get_friends_datasource.dart';
 import 'package:talking/src/features/home/data/datasources/get_friends_datasource/get_friends_firebase_datasource_imp.dart';
+import 'package:talking/src/features/home/data/datasources/get_messages_datasource/get_messages_datasource.dart';
+import 'package:talking/src/features/home/data/datasources/get_messages_datasource/get_messages_firebase_datasource_imp.dart';
 import 'package:talking/src/features/home/data/datasources/search_users_datasource/search_users_datasource.dart';
 import 'package:talking/src/features/home/data/datasources/search_users_datasource/search_users_firebase_datasource_imp.dart';
 import 'package:talking/src/features/home/data/datasources/send_friend_request_datasource/send_friend_request_datasource.dart';
 import 'package:talking/src/features/home/data/datasources/send_friend_request_datasource/send_friend_request_firebase_datasource_imp.dart';
+import 'package:talking/src/features/home/data/datasources/send_message_datasource/send_message_datasource.dart';
+import 'package:talking/src/features/home/data/datasources/send_message_datasource/send_message_firebase_datasource_imp.dart';
 import 'package:talking/src/features/home/data/repositories/get_current_user_repository_imp.dart';
 import 'package:talking/src/features/home/data/repositories/get_friends_repository_imp.dart';
+import 'package:talking/src/features/home/data/repositories/get_messages_repository_imp.dart';
 import 'package:talking/src/features/home/data/repositories/search_users_repository_imp.dart';
 import 'package:talking/src/features/home/data/repositories/send_friend_request_repository_imp.dart';
+import 'package:talking/src/features/home/data/repositories/send_message_repository_imp.dart';
 import 'package:talking/src/features/home/domain/repositories/get_current_user_repository.dart';
 import 'package:talking/src/features/home/domain/repositories/get_friends_repository.dart';
+import 'package:talking/src/features/home/domain/repositories/get_messages_repository.dart';
 import 'package:talking/src/features/home/domain/repositories/search_users_repository.dart';
 import 'package:talking/src/features/home/domain/repositories/send_friend_request_repository.dart';
+import 'package:talking/src/features/home/domain/repositories/send_message_repository.dart';
 import 'package:talking/src/features/home/domain/usecases/get_current_user_usecase/get_current_user_usecase.dart';
 import 'package:talking/src/features/home/domain/usecases/get_current_user_usecase/get_current_user_usecase_imp.dart';
 import 'package:talking/src/features/home/domain/usecases/get_friends_usecase/get_friends_usecase.dart';
 import 'package:talking/src/features/home/domain/usecases/get_friends_usecase/get_friends_usecase_imp.dart';
+import 'package:talking/src/features/home/domain/usecases/get_messages_usecase/get_messages_usecase.dart';
+import 'package:talking/src/features/home/domain/usecases/get_messages_usecase/get_messages_usecase_imp.dart';
 import 'package:talking/src/features/home/domain/usecases/search_users_usecase/search_users_usecase.dart';
 import 'package:talking/src/features/home/domain/usecases/search_users_usecase/search_users_usecase_imp.dart';
 import 'package:talking/src/features/home/domain/usecases/send_friend_request_usecase/send_friend_request_usecase.dart';
 import 'package:talking/src/features/home/domain/usecases/send_friend_request_usecase/send_friend_request_usecase_imp.dart';
+import 'package:talking/src/features/home/domain/usecases/send_message_usecase/send_message_usecase.dart';
+import 'package:talking/src/features/home/domain/usecases/send_message_usecase/send_message_usecase_imp.dart';
 import 'package:talking/src/features/home/presentation/blocs/friends/friends_bloc.dart';
+import 'package:talking/src/features/home/presentation/blocs/messages/messages_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/search/search_bloc.dart';
+import 'package:talking/src/features/home/presentation/controllers/conversation_controller.dart';
 import 'package:talking/src/features/home/presentation/controllers/profile_controller.dart';
 import 'package:talking/src/features/home/presentation/controllers/search_controller.dart';
+import 'package:talking/src/features/home/presentation/pages/conversation_page.dart';
 import 'package:talking/src/features/home/presentation/pages/main_page.dart';
 import 'package:talking/src/features/home/presentation/pages/chats_page.dart';
 import 'package:talking/src/features/home/presentation/pages/feed_page.dart';
@@ -64,6 +79,24 @@ class HomeModule extends Module {
         Bind.lazySingleton<IGetFriendsUsecase>((i) => GetFriendsUsecaseImp(i())),
         Bind.lazySingleton<FriendsBloc>((i) => FriendsBloc(i()), onDispose: (bloc) => bloc.close()),
 
+        // Send Message
+
+        Bind.lazySingleton<ISendMessageDatasource>((i) => SendMessageFirebaseDatasourceImp()),
+        Bind.lazySingleton<ISendMessageRepository>((i) => SendMessageRepositoryImp(i())),
+        Bind.lazySingleton<ISendMessageUsecase>((i) => SendMessageUsecaseImp(i())),
+
+        // Get Messages
+
+        Bind.lazySingleton<IGetMessagesDatasource>((i) => GetMessagesFirebaseDatasourceImp()),
+        Bind.lazySingleton<IGetMessagesRepository>((i) => GetMessagesRepositoryImp(i())),
+        Bind.lazySingleton<IGetMessagesUsecase>((i) => GetMessagesUsecaseImp(i())),
+
+        // Conversation
+
+        Bind.factory<MessagesBloc>((i) => MessagesBloc(i())),
+
+        Bind.factory<ConversationController>((i) => ConversationController(i())),
+
         Bind.factory<SearchController>((i) => SearchController(i())),
       ];
 
@@ -86,6 +119,12 @@ class HomeModule extends Module {
           child: (_, __) => const SearchPage(),
           duration: const Duration(milliseconds: 150),
           transition: TransitionType.rightToLeftWithFade,
+        ),
+        ChildRoute(
+          '/conversation',
+          child: (_, args) => ConversationPage(friend: args.data),
+          duration: const Duration(milliseconds: 150),
+          transition: TransitionType.fadeIn,
         ),
       ];
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class HomeGuard extends RouteGuard {
   HomeGuard() : super(redirectTo: '/auth/');
@@ -10,6 +11,14 @@ class HomeGuard extends RouteGuard {
   FutureOr<bool> canActivate(String path, ParallelRoute route) async {
     final auth = FirebaseAuth.instance;
 
-    return auth.currentUser != null ? true : false;
+    final user = auth.currentUser;
+
+    if (user == null) {
+      return false;
+    } else {
+      await Hive.box('app').put('uid', user.uid);
+
+      return true;
+    }
   }
 }
