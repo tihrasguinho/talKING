@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:talking/src/core/domain/entities/user_entity.dart';
 import 'package:talking/src/core/enums/message_type.dart';
+import 'package:talking/src/features/home/data/dtos/message_dto.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
 import 'package:talking/src/features/home/presentation/blocs/messages/messages_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/messages/messages_event.dart';
@@ -55,7 +55,7 @@ class _ConversationPageState extends State<ConversationPage> {
   void initState() {
     super.initState();
 
-    subscription = stream().listen((event) => bloc.add(LoadMessagesEvent(event.docs)));
+    subscription = stream().listen((event) => bloc.input.add(LoadMessagesEvent(event.docs)));
   }
 
   @override
@@ -74,9 +74,13 @@ class _ConversationPageState extends State<ConversationPage> {
       body: Column(
         children: [
           Expanded(
-            child: BlocBuilder<MessagesBloc, MessagesState>(
-              bloc: bloc,
-              builder: (context, state) {
+            child: StreamBuilder<MessagesState>(
+              stream: bloc.output,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return const SizedBox();
+
+                final state = snapshot.data;
+
                 if (state is LoadingMessagesState) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is ErrorMessagesState) {
@@ -113,11 +117,22 @@ class _ConversationPageState extends State<ConversationPage> {
                                       : Theme.of(context).appBarTheme.backgroundColor,
                                   borderRadius: BorderRadius.circular(16.0),
                                 ),
-                                child: Text(
-                                  message.message,
-                                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                                        color: Colors.white,
-                                      ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      message.message,
+                                      style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                            color: Colors.white,
+                                          ),
+                                    ),
+                                    Text(
+                                      message.timeFormatted,
+                                      style: Theme.of(context).textTheme.overline!.copyWith(
+                                            color: Colors.white,
+                                          ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             );

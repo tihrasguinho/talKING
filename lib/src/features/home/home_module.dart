@@ -93,7 +93,7 @@ class HomeModule extends Module {
 
         // Conversation
 
-        Bind.factory<MessagesBloc>((i) => MessagesBloc(i())),
+        Bind.factory<MessagesBloc>((i) => MessagesBloc()),
 
         Bind.factory<ConversationController>((i) => ConversationController(i())),
 

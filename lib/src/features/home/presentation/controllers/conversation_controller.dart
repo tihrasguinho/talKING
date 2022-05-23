@@ -14,9 +14,7 @@ class ConversationController {
     final result = await _sendMessageUsecase(SendMessageParams.text(message, friendUid));
 
     if (result.isRight()) {
-      final message = result.fold((l) => null, (r) => r) as TextMessageEntity;
-
-      log(message.toString());
+      result.fold((l) => null, (r) => r) as TextMessageEntity;
     } else {
       final exception = result.fold((l) => l, (r) => null) as AppException;
 

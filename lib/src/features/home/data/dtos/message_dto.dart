@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:talking/src/core/enums/message_type.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
 
@@ -47,4 +48,10 @@ extension MessageDto on MessageEntity {
   }
 
   String textToJson() => jsonEncode(textToMap());
+
+  String get timeFormatted {
+    final formatter = DateFormat('HH:mm');
+
+    return formatter.format(time);
+  }
 }
