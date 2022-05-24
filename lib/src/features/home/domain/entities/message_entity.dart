@@ -24,7 +24,7 @@ abstract class MessageEntity {
 
   @override
   int get hashCode {
-    return id.hashCode ^ from.hashCode ^ to.hashCode ^ type.hashCode ^ time.hashCode;
+    return id.hashCode;
   }
 }
 
@@ -44,11 +44,11 @@ class TextMessageEntity extends MessageEntity {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is TextMessageEntity && other.id == super.id;
+    return other is MessageEntity && other.id == super.id;
   }
 
   @override
-  int get hashCode => message.hashCode;
+  int get hashCode => id.hashCode;
 }
 
 class ImageMessageEntity extends MessageEntity {
@@ -73,7 +73,7 @@ class ImageMessageEntity extends MessageEntity {
   }
 
   @override
-  int get hashCode => image.hashCode;
+  int get hashCode => id.hashCode;
 }
 
 // class MessageEntity {
