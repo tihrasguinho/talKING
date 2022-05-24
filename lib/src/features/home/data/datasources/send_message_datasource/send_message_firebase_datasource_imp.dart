@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:talking/src/core/enums/message_type.dart';
 import 'package:talking/src/core/others/app_exception.dart';
 import 'package:talking/src/core/params/send_message_params.dart';
@@ -13,6 +16,7 @@ class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
     try {
       final auth = FirebaseAuth.instance;
       final firestore = FirebaseFirestore.instance;
+      final storage = FirebaseStorage.instance;
 
       final uid = auth.currentUser?.uid;
 
@@ -29,9 +33,6 @@ class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
               'message': params.message,
               'from': uid,
               'to': params.to,
-              'image': null,
-              'audio': null,
-              'video': null,
               'type': params.type.desc,
               'time': time,
             };
@@ -51,13 +52,19 @@ class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
           }
         case MessageType.image:
           {
+            final sufix = params.image.split('/').last.split('.').last.toUpperCase();
+
+            final name = '$uid-${DateTime.now().toUtc().toIso8601String()}.$sufix';
+
+            final upload = await storage.ref().child(uid).child(name).putFile(File(params.image));
+
+            final url = await upload.ref.getDownloadURL();
+
             final message = <String, dynamic>{
-              'message': params.message,
               'from': uid,
               'to': params.to,
-              'image': null,
-              'audio': null,
-              'video': null,
+              'image': url,
+              'aspect_ratio': params.aspectRatio,
               'type': params.type.desc,
               'time': time,
             };
@@ -65,9 +72,10 @@ class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
             final doc = await firestore.collection('cl_messages').add(message);
 
             return Right(
-              TextMessageEntity(
+              ImageMessageEntity(
                 id: doc.id,
-                message: params.message,
+                image: url,
+                aspectRatio: params.aspectRatio,
                 from: uid,
                 to: params.to,
                 type: params.type,

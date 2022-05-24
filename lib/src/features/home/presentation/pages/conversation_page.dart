@@ -7,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:talking/src/core/domain/entities/user_entity.dart';
 import 'package:talking/src/core/enums/message_type.dart';
+import 'package:talking/src/core/widgets/custom_circle_avatar.dart';
 import 'package:talking/src/features/home/data/dtos/message_dto.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
 import 'package:talking/src/features/home/presentation/blocs/messages/messages_bloc.dart';
@@ -69,7 +70,28 @@ class _ConversationPageState extends State<ConversationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.friend.name),
+        titleSpacing: 0.0,
+        title: Row(
+          children: [
+            CustomCircleAvatar(
+              user: widget.friend,
+              size: const Size(32, 32),
+            ),
+            const SizedBox(width: 8.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.friend.name),
+                // Text(
+                //   'Online',
+                //   style: Theme.of(context).textTheme.overline!.copyWith(
+                //         color: Colors.white70,
+                //       ),
+                // ),
+              ],
+            ),
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -139,9 +161,57 @@ class _ConversationPageState extends State<ConversationPage> {
                           }
                         case MessageType.image:
                           {
-                            message as TextMessageEntity;
+                            message as ImageMessageEntity;
 
-                            return Text(message.message);
+                            return Align(
+                              alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  right: isMe ? 24.0 : 75.0,
+                                  left: isMe ? 75.0 : 24.0,
+                                  top: 4.0,
+                                  bottom: 4.0,
+                                ),
+                                child: AspectRatio(
+                                  aspectRatio: message.aspectRatio,
+                                  child: Container(
+                                    clipBehavior: Clip.antiAlias,
+                                    decoration: BoxDecoration(
+                                      color: isMe
+                                          ? Theme.of(context).colorScheme.secondaryContainer
+                                          : Theme.of(context).appBarTheme.backgroundColor,
+                                      borderRadius: BorderRadius.circular(16.0),
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Image.network(
+                                          message.image,
+                                          loadingBuilder: (context, child, loadingProgress) {
+                                            if (loadingProgress == null) return child;
+                                            return const Center(child: CircularProgressIndicator());
+                                          },
+                                        ),
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 16.0,
+                                              vertical: 8.0,
+                                            ),
+                                            child: Text(
+                                              message.timeFormatted,
+                                              style: Theme.of(context).textTheme.overline!.copyWith(
+                                                    color: Colors.white,
+                                                  ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
                           }
                         case MessageType.audio:
                           {
@@ -190,6 +260,10 @@ class _ConversationPageState extends State<ConversationPage> {
                         hintText: 'Send your message',
                       ),
                     ),
+                  ),
+                  IconButton(
+                    onPressed: () => controller.sendImageMessage(widget.friend.uid),
+                    icon: const Icon(Icons.attach_file_rounded),
                   ),
                   IconButton(
                     onPressed: () => {

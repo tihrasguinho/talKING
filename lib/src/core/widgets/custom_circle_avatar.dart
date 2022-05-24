@@ -36,6 +36,7 @@ class CustomCircleAvatar extends StatelessWidget {
                 _sufix(),
                 style: Theme.of(context).textTheme.headline5!.copyWith(
                       color: Colors.white,
+                      fontSize: size.width * 0.5,
                     ),
               ),
             )

@@ -49,6 +49,22 @@ extension MessageDto on MessageEntity {
 
   String textToJson() => jsonEncode(textToMap());
 
+  static ImageMessageEntity imageFromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+
+    final time = data['time'] as Timestamp;
+
+    return ImageMessageEntity(
+      id: doc.id,
+      image: data['image'] ?? '',
+      aspectRatio: data['aspect_ratio'] ?? 1 / 1,
+      from: data['from'] ?? '',
+      to: data['to'] ?? '',
+      type: MessageType.values.singleWhere((e) => e.desc == data['type']),
+      time: DateTime.fromMillisecondsSinceEpoch(time.millisecondsSinceEpoch),
+    );
+  }
+
   String get timeFormatted {
     final formatter = DateFormat('HH:mm');
 

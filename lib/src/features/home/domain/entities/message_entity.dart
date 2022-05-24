@@ -19,22 +19,12 @@ abstract class MessageEntity {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is MessageEntity &&
-        other.id == id &&
-        other.from == from &&
-        other.to == to &&
-        other.type == type &&
-        other.time == time;
+    return other is MessageEntity && other.id == id;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^ from.hashCode ^ to.hashCode ^ type.hashCode ^ time.hashCode;
-  }
-
-  @override
-  String toString() {
-    return 'MessageEntity(id: $id, from: $from, to: $to, type: $type, time: $time)';
   }
 }
 
@@ -54,55 +44,36 @@ class TextMessageEntity extends MessageEntity {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is TextMessageEntity &&
-        other.id == id &&
-        other.message == message &&
-        other.from == from &&
-        other.to == to &&
-        other.type == type &&
-        other.time == time;
+    return other is TextMessageEntity && other.id == super.id;
   }
 
   @override
-  int get hashCode {
-    return id.hashCode ^ message.hashCode ^ from.hashCode ^ to.hashCode ^ type.hashCode ^ time.hashCode;
-  }
-
-  @override
-  String toString() {
-    return 'MessageEntity(id: $id, message: $message, from: $from, to: $to, type: $type, time: $time)';
-  }
-
-  TextMessageEntity copyWith({
-    String? id,
-    String? message,
-    String? from,
-    String? to,
-    MessageType? type,
-    DateTime? time,
-  }) {
-    return TextMessageEntity(
-      id: id ?? super.id,
-      message: message ?? this.message,
-      from: from ?? super.from,
-      to: to ?? super.to,
-      type: type ?? super.type,
-      time: time ?? super.time,
-    );
-  }
+  int get hashCode => message.hashCode;
 }
 
 class ImageMessageEntity extends MessageEntity {
-  final String imageUrl;
+  final String image;
+  final double aspectRatio;
 
   ImageMessageEntity({
     required super.id,
-    required this.imageUrl,
+    required this.image,
+    required this.aspectRatio,
     required super.from,
     required super.to,
     required super.type,
     required super.time,
   });
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ImageMessageEntity && other.id == id;
+  }
+
+  @override
+  int get hashCode => image.hashCode;
 }
 
 // class MessageEntity {
