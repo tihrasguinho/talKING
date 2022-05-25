@@ -1,10 +1,10 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:talking/src/core/domain/entities/user_entity.dart';
 import 'package:talking/src/core/enums/message_type.dart';
 import 'package:talking/src/core/widgets/custom_circle_avatar.dart';
@@ -34,29 +34,17 @@ class _ConversationPageState extends State<ConversationPage> {
 
   final hive = Hive.box('app');
 
-  late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> subscription;
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> stream() {
-    Stream<QuerySnapshot<Map<String, dynamic>>> from = firestore
-        .collection('cl_messages')
-        .where('from', isEqualTo: hive.get('uid'))
-        .where('to', isEqualTo: widget.friend.uid)
-        .snapshots();
-
-    Stream<QuerySnapshot<Map<String, dynamic>>> to = firestore
-        .collection('cl_messages')
-        .where('from', isEqualTo: widget.friend.uid)
-        .where('to', isEqualTo: hive.get('uid'))
-        .snapshots();
-
-    return from.mergeWith([to]);
-  }
+  late StreamSubscription<List<QueryDocumentSnapshot<Map<String, dynamic>>>> subscription;
 
   @override
   void initState() {
     super.initState();
 
-    subscription = stream().listen((event) => bloc.input.add(LoadMessagesEvent(event.docs)));
+    subscription = controller.stream(hive.get('uid'), widget.friend.uid).listen((event) {
+      log(event.length.toString());
+
+      bloc.input.add(LoadMessagesEvent(event));
+    });
   }
 
   @override

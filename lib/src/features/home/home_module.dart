@@ -35,9 +35,11 @@ import 'package:talking/src/features/home/domain/usecases/send_friend_request_us
 import 'package:talking/src/features/home/domain/usecases/send_friend_request_usecase/send_friend_request_usecase_imp.dart';
 import 'package:talking/src/features/home/domain/usecases/send_message_usecase/send_message_usecase.dart';
 import 'package:talking/src/features/home/domain/usecases/send_message_usecase/send_message_usecase_imp.dart';
+import 'package:talking/src/features/home/presentation/blocs/current_user/current_user_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/friends/friends_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/messages/messages_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/search/search_bloc.dart';
+import 'package:talking/src/features/home/presentation/controllers/chats_controller.dart';
 import 'package:talking/src/features/home/presentation/controllers/conversation_controller.dart';
 import 'package:talking/src/features/home/presentation/controllers/profile_controller.dart';
 import 'package:talking/src/features/home/presentation/controllers/search_controller.dart';
@@ -57,6 +59,7 @@ class HomeModule extends Module {
         Bind.lazySingleton<IGetCurrentUserDatasource>((i) => GetCurrentUserFirebaseDatasourceImp()),
         Bind.lazySingleton<IGetCurrentUserRepository>((i) => GetCurrentUserRepositoryImp(i())),
         Bind.lazySingleton<IGetCurrentUserUsecase>((i) => GetCurrentUserUsecaseImp(i())),
+        Bind.singleton<CurrentUserBloc>((i) => CurrentUserBloc(i()), onDispose: (bloc) => bloc.dispose()),
         Bind.factory<ProfileController>((i) => ProfileController(i())),
 
         // Search Users
@@ -77,7 +80,7 @@ class HomeModule extends Module {
         Bind.lazySingleton<IGetFriendsDatasource>((i) => GetFriendsFirebaseDatasourceImp()),
         Bind.lazySingleton<IGetFriendsRepository>((i) => GetFriendsRepositoryImp(i())),
         Bind.lazySingleton<IGetFriendsUsecase>((i) => GetFriendsUsecaseImp(i())),
-        Bind.lazySingleton<FriendsBloc>((i) => FriendsBloc(i()), onDispose: (bloc) => bloc.close()),
+        Bind.singleton<FriendsBloc>((i) => FriendsBloc(i()), onDispose: (bloc) => bloc.dispose()),
 
         // Send Message
 
@@ -90,6 +93,8 @@ class HomeModule extends Module {
         Bind.lazySingleton<IGetMessagesDatasource>((i) => GetMessagesFirebaseDatasourceImp()),
         Bind.lazySingleton<IGetMessagesRepository>((i) => GetMessagesRepositoryImp(i())),
         Bind.lazySingleton<IGetMessagesUsecase>((i) => GetMessagesUsecaseImp(i())),
+
+        Bind.factory<ChatsController>((i) => ChatsController(i(), i())),
 
         // Conversation
 

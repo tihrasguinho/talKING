@@ -7,8 +7,6 @@ import 'package:talking/src/features/home/presentation/blocs/messages/messages_e
 import 'package:talking/src/features/home/presentation/blocs/messages/messages_state.dart';
 
 class MessagesBloc {
-  final _state = <MessageEntity>[];
-
   final _streamController = StreamController<MessagesEvent>.broadcast();
 
   Sink<MessagesEvent> get input => _streamController.sink;
@@ -31,7 +29,7 @@ class MessagesBloc {
 
       // final videosDocs = event.docs.where((e) => e.data()['type'] == 'video').toList();
 
-      final messages = <MessageEntity>[..._state];
+      final messages = <MessageEntity>[];
 
       messages.addAll(textsMessages);
 
@@ -39,21 +37,17 @@ class MessagesBloc {
 
       messages.sort((a, b) => b.time.compareTo(a.time));
 
-      _state.clear();
-
-      _state.addAll(messages);
-
-      yield SuccessMessagesState(_filtering(_state));
+      yield SuccessMessagesState(messages);
     }
   }
 }
 
-List<MessageEntity> _filtering(List<MessageEntity> list) {
-  final data = <String, MessageEntity>{};
+// List<MessageEntity> _filtering(List<MessageEntity> list) {
+//   final data = <String, MessageEntity>{};
 
-  for (var item in list) {
-    data[item.id] = item;
-  }
+//   for (var item in list) {
+//     data[item.id] = item;
+//   }
 
-  return data.values.toList();
-}
+//   return data.values.toList();
+// }

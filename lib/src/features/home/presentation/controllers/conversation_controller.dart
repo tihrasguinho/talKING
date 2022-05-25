@@ -1,7 +1,9 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image/image.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:talking/src/core/others/app_exception.dart';
 import 'package:talking/src/core/params/send_message_params.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
@@ -50,5 +52,26 @@ class ConversationController {
 
       log(exception.error, name: 'SendMessageException');
     }
+  }
+
+  Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> stream(String userUid, String friendUid) {
+    final firestore = FirebaseFirestore.instance;
+
+    final from = firestore
+        .collection('cl_messages')
+        .where('from', isEqualTo: userUid)
+        .where('to', isEqualTo: friendUid)
+        .snapshots(includeMetadataChanges: true);
+
+    final to = firestore
+        .collection('cl_messages')
+        .where('from', isEqualTo: friendUid)
+        .where('to', isEqualTo: userUid)
+        .snapshots(includeMetadataChanges: true);
+
+    final data = Rx.combineLatest2<QuerySnapshot<Map<String, dynamic>>, QuerySnapshot<Map<String, dynamic>>,
+        List<QueryDocumentSnapshot<Map<String, dynamic>>>>(from, to, (a, b) => [...a.docs, ...b.docs]);
+
+    return data.asBroadcastStream();
   }
 }

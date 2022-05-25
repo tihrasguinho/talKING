@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:talking/src/core/widgets/custom_circle_avatar.dart';
 import 'package:talking/src/features/home/presentation/blocs/friends/friends_bloc.dart';
@@ -20,15 +19,15 @@ class _FriendsPageState extends State<FriendsPage> {
   void initState() {
     super.initState();
 
-    bloc.add(FetchFriendsEvent());
+    bloc.emit(FetchFriendsEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<FriendsBloc, FriendsState>(
-        bloc: bloc,
-        builder: (context, state) {
+      body: ValueListenableBuilder<FriendsState>(
+        valueListenable: bloc,
+        builder: (context, state, child) {
           if (state is LoadingFriendsState) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ErrorFriendsState) {

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:talking/src/core/domain/entities/user_entity.dart';
 import 'package:talking/src/core/widgets/custom_circle_avatar.dart';
+import 'package:talking/src/features/home/presentation/blocs/current_user/current_user_bloc.dart';
+import 'package:talking/src/features/home/presentation/blocs/current_user/current_user_state.dart';
 import 'package:talking/src/features/home/presentation/controllers/profile_controller.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -13,6 +14,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final ProfileController controller = Modular.get();
+  final CurrentUserBloc bloc = Modular.get();
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +33,14 @@ class _ProfilePageState extends State<ProfilePage> {
       body: Column(
         children: [
           const SizedBox(height: 24.0),
-          FutureBuilder<UserEntity?>(
-            future: controller.getCurrentUser(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) return const SizedBox();
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Text('Loading');
-              } else if (snapshot.connectionState == ConnectionState.done) {
+          ValueListenableBuilder<CurrentUserState>(
+            valueListenable: bloc,
+            builder: (context, state, child) {
+              if (state is LoadingCurrentUserState) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is ErrorCurrentUserState) {
+                return Center(child: Text(state.error));
+              } else if (state is SuccessCurrentUserState) {
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 24.0),
                   padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
@@ -50,14 +52,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Row(
                     children: [
                       CustomCircleAvatar(
-                        user: snapshot.data!,
+                        user: state.user,
                       ),
                       const SizedBox(width: 8.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            snapshot.data?.name ?? '',
+                            state.user.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: Theme.of(context).textTheme.subtitle1!.copyWith(
@@ -66,7 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                           ),
                           Text(
-                            snapshot.data?.email ?? '',
+                            state.user.email,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: Theme.of(context).textTheme.bodySmall!.copyWith(
@@ -75,7 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                           ),
                           Text(
-                            snapshot.data?.username ?? '',
+                            state.user.username,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: Theme.of(context).textTheme.bodySmall!.copyWith(

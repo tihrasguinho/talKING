@@ -11,7 +11,7 @@ class MainWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Modular.setNavigatorKey(navigatorKey);
-    Modular.setInitialRoute('/home');
+    Modular.setInitialRoute('/chats');
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
