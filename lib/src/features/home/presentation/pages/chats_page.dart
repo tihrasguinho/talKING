@@ -1,9 +1,12 @@
-import 'dart:async';
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:talking/src/core/enums/message_type.dart';
+import 'package:talking/src/core/widgets/custom_circle_avatar.dart';
+import 'package:talking/src/features/home/data/dtos/message_dto.dart';
+import 'package:talking/src/features/home/domain/entities/chat_entity.dart';
+import 'package:talking/src/features/home/domain/entities/message_entity.dart';
+import 'package:talking/src/features/home/presentation/blocs/chats/chats_bloc.dart';
+import 'package:talking/src/features/home/presentation/blocs/friends/friends_bloc.dart';
 import 'package:talking/src/features/home/presentation/controllers/chats_controller.dart';
 
 class ChatsPage extends StatefulWidget {
@@ -14,26 +17,10 @@ class ChatsPage extends StatefulWidget {
 }
 
 class _ChatsPageState extends State<ChatsPage> {
+  final ChatsBloc chatsBloc = Modular.get();
+  final FriendsBloc friendsBloc = Modular.get();
+
   final ChatsController controller = Modular.get();
-
-  StreamSubscription<List<QueryDocumentSnapshot<Map<String, dynamic>>>>? subscription;
-
-  @override
-  void initState() {
-    super.initState();
-
-    Future.delayed(const Duration(seconds: 1), () {
-      subscription = controller.stream().listen((event) {
-        log(event.length.toString());
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    subscription?.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,17 +28,126 @@ class _ChatsPageState extends State<ChatsPage> {
       appBar: AppBar(
         title: const Text('Chats'),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => showModalBottomSheet(
-      //     context: context,
-      //     builder: (context) {
-      //       return Column(
-      //         children: [],
-      //       );
-      //     },
-      //   ),
-      //   child: const Icon(Icons.add_rounded),
-      // ),
+      body: ValueListenableBuilder<List<ChatEntity>>(
+        valueListenable: chatsBloc,
+        builder: (context, state, child) {
+          return ListView.separated(
+            padding: const EdgeInsets.only(top: 8.0),
+            separatorBuilder: (_, __) {
+              return Container(
+                color: const Color(0xFF212121),
+                height: 1,
+                width: double.maxFinite,
+                margin: const EdgeInsets.only(left: 75.0),
+              );
+            },
+            itemCount: state.length,
+            itemBuilder: (context, index) {
+              final chat = state[index];
+              final friend = friendsBloc.friends.firstWhere((e) => e.uid == chat.friend);
+
+              return ListTile(
+                onTap: () => Modular.to.pushNamed('/conversation', arguments: friend),
+                leading: CustomCircleAvatar(
+                  user: friend,
+                ),
+                title: Text(
+                  friend.name,
+                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                subtitle: _messageMap(chat.messages.first),
+                trailing: Text(
+                  chat.messages.first.timeFormatted,
+                  style: Theme.of(context).textTheme.overline!.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.normal,
+                      ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
+  }
+
+  Widget _messageMap(MessageEntity message) {
+    switch (message.type) {
+      case MessageType.text:
+        {
+          message as TextMessageEntity;
+
+          return Text(
+            message.message,
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  color: Colors.white70,
+                  fontWeight: FontWeight.normal,
+                ),
+          );
+        }
+      case MessageType.image:
+        {
+          return Row(
+            children: [
+              const Icon(
+                Icons.image_rounded,
+                color: Colors.white70,
+                size: 16,
+              ),
+              const SizedBox(width: 4.0),
+              Text(
+                'Image',
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: Colors.white70,
+                      fontWeight: FontWeight.normal,
+                    ),
+              ),
+            ],
+          );
+        }
+      case MessageType.audio:
+        {
+          return Row(
+            children: [
+              const Icon(
+                Icons.mic_rounded,
+                color: Colors.white70,
+                size: 16,
+              ),
+              const SizedBox(width: 4.0),
+              Text(
+                'Audio',
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: Colors.white70,
+                      fontWeight: FontWeight.normal,
+                    ),
+              ),
+            ],
+          );
+        }
+      case MessageType.video:
+        {
+          return Row(
+            children: [
+              const Icon(
+                Icons.video_camera_back_rounded,
+                color: Colors.white70,
+                size: 16,
+              ),
+              const SizedBox(width: 4.0),
+              Text(
+                'Video',
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: Colors.white70,
+                      fontWeight: FontWeight.normal,
+                    ),
+              ),
+            ],
+          );
+        }
+    }
   }
 }

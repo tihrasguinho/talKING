@@ -14,18 +14,6 @@ abstract class MessageEntity {
     required this.type,
     required this.time,
   });
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is MessageEntity && other.id == id;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode;
-  }
 }
 
 class TextMessageEntity extends MessageEntity {
@@ -49,6 +37,9 @@ class TextMessageEntity extends MessageEntity {
 
   @override
   int get hashCode => id.hashCode;
+
+  @override
+  String toString() => 'TextMessageEntity(message: $message)';
 }
 
 class ImageMessageEntity extends MessageEntity {
@@ -74,6 +65,9 @@ class ImageMessageEntity extends MessageEntity {
 
   @override
   int get hashCode => id.hashCode;
+
+  @override
+  String toString() => 'ImageMessageEntity(image: $image, aspectRatio: $aspectRatio)';
 }
 
 // class MessageEntity {

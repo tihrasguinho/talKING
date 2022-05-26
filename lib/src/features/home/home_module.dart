@@ -35,12 +35,14 @@ import 'package:talking/src/features/home/domain/usecases/send_friend_request_us
 import 'package:talking/src/features/home/domain/usecases/send_friend_request_usecase/send_friend_request_usecase_imp.dart';
 import 'package:talking/src/features/home/domain/usecases/send_message_usecase/send_message_usecase.dart';
 import 'package:talking/src/features/home/domain/usecases/send_message_usecase/send_message_usecase_imp.dart';
+import 'package:talking/src/features/home/presentation/blocs/chats/chats_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/current_user/current_user_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/friends/friends_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/messages/messages_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/search/search_bloc.dart';
 import 'package:talking/src/features/home/presentation/controllers/chats_controller.dart';
 import 'package:talking/src/features/home/presentation/controllers/conversation_controller.dart';
+import 'package:talking/src/features/home/presentation/controllers/main_controller.dart';
 import 'package:talking/src/features/home/presentation/controllers/profile_controller.dart';
 import 'package:talking/src/features/home/presentation/controllers/search_controller.dart';
 import 'package:talking/src/features/home/presentation/pages/conversation_page.dart';
@@ -103,6 +105,12 @@ class HomeModule extends Module {
         Bind.factory<ConversationController>((i) => ConversationController(i())),
 
         Bind.factory<SearchController>((i) => SearchController(i())),
+
+        // Chats
+
+        Bind.lazySingleton<ChatsBloc>((i) => ChatsBloc(), onDispose: (bloc) => bloc.dispose()),
+
+        Bind.factory<MainController>((i) => MainController()),
       ];
 
   @override
