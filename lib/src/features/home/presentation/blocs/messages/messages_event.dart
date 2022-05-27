@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class MessagesEvent {}
 
+class InitialMessagesEvent extends MessagesEvent {}
+
 class FetchMessagesEvent extends MessagesEvent {
   final String friendUid;
 

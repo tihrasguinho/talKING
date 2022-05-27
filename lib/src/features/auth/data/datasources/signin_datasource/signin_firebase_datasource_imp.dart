@@ -22,7 +22,11 @@ class SigninFirebaseDatasourceImp implements ISigninDatasource {
       final query = await firestore.collection('cl_users').doc(credential.user!.uid).get();
 
       if (query.exists) {
-        final token = await messaging.getToken(vapidKey: kIsWeb ? AppConsts.vapidKey : null);
+        final settings = await messaging.getNotificationSettings();
+
+        final token = settings.authorizationStatus == AuthorizationStatus.authorized
+            ? await messaging.getToken(vapidKey: kIsWeb ? AppConsts.vapidKey : null)
+            : null;
 
         await firestore.collection('cl_users').doc(credential.user!.uid).update({
           'token': token,

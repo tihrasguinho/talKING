@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -41,9 +40,7 @@ class _ConversationPageState extends State<ConversationPage> {
     super.initState();
 
     subscription = controller.stream(hive.get('uid'), widget.friend.uid).listen((event) {
-      log(event.length.toString());
-
-      bloc.input.add(LoadMessagesEvent(event));
+      bloc.emit(LoadMessagesEvent(event));
     });
   }
 
@@ -85,7 +82,7 @@ class _ConversationPageState extends State<ConversationPage> {
         children: [
           Expanded(
             child: StreamBuilder<MessagesState>(
-              stream: bloc.output,
+              stream: bloc.stream,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) return const SizedBox();
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:talking/src/core/widgets/custom_circle_avatar.dart';
 import 'package:talking/src/features/home/presentation/blocs/search/search_bloc.dart';
@@ -32,15 +31,15 @@ class _SearchPageState extends State<SearchPage> {
   void initState() {
     super.initState();
 
-    // Initial fetch to get 10 items
-    bloc.add(FetchSearchEvent(''));
-
-    // Listen to changes on textField and calls BloC
     input.addListener(() {
       setSearching(input.text.isNotEmpty);
 
       if (input.text.length > 3) {
-        bloc.add(FetchSearchEvent(input.text));
+        bloc.emit(FetchSearchEvent(input.text));
+      }
+
+      if (input.text.isEmpty) {
+        bloc.emit(FetchSearchEvent(''));
       }
     });
   }
@@ -59,7 +58,7 @@ class _SearchPageState extends State<SearchPage> {
         leading: IconButton(
           onPressed: () => searching
               ? {
-                  bloc.add(ClearSearchEvent()),
+                  bloc.emit(ClearSearchEvent()),
                   input.clear(),
                 }
               : Modular.to.pop(),
@@ -84,9 +83,13 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
       ),
-      body: BlocBuilder<SearchBloc, SearchState>(
-        bloc: bloc,
-        builder: (context, state) {
+      body: StreamBuilder<SearchState>(
+        stream: bloc.stream,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return const SizedBox();
+
+          final state = snapshot.data;
+
           if (state is LoadingSearchState) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ErrorSearchState) {

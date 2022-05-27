@@ -3,11 +3,11 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:talking/src/core/enums/message_type.dart';
 import 'package:talking/src/core/widgets/custom_circle_avatar.dart';
 import 'package:talking/src/features/home/data/dtos/message_dto.dart';
-import 'package:talking/src/features/home/domain/entities/chat_entity.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
 import 'package:talking/src/features/home/presentation/blocs/chats/chats_bloc.dart';
+import 'package:talking/src/features/home/presentation/blocs/chats/chats_state.dart';
 import 'package:talking/src/features/home/presentation/blocs/friends/friends_bloc.dart';
-import 'package:talking/src/features/home/presentation/controllers/chats_controller.dart';
+import 'package:talking/src/features/home/presentation/blocs/friends/friends_state.dart';
 
 class ChatsPage extends StatefulWidget {
   const ChatsPage({Key? key}) : super(key: key);
@@ -20,55 +20,82 @@ class _ChatsPageState extends State<ChatsPage> {
   final ChatsBloc chatsBloc = Modular.get();
   final FriendsBloc friendsBloc = Modular.get();
 
-  final ChatsController controller = Modular.get();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chats'),
       ),
-      body: ValueListenableBuilder<List<ChatEntity>>(
-        valueListenable: chatsBloc,
-        builder: (context, state, child) {
-          return ListView.separated(
-            padding: const EdgeInsets.only(top: 8.0),
-            separatorBuilder: (_, __) {
-              return Container(
-                color: const Color(0xFF212121),
-                height: 1,
-                width: double.maxFinite,
-                margin: const EdgeInsets.only(left: 75.0),
-              );
-            },
-            itemCount: state.length,
-            itemBuilder: (context, index) {
-              final chat = state[index];
-              final friend = friendsBloc.friends.firstWhere((e) => e.uid == chat.friend);
+      body: StreamBuilder<FriendsState>(
+        stream: friendsBloc.stream,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return const SizedBox();
 
-              return ListTile(
-                onTap: () => Modular.to.pushNamed('/conversation', arguments: friend),
-                leading: CustomCircleAvatar(
-                  user: friend,
-                ),
-                title: Text(
-                  friend.name,
-                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                subtitle: _messageMap(chat.messages.first),
-                trailing: Text(
-                  chat.messages.first.timeFormatted,
-                  style: Theme.of(context).textTheme.overline!.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.normal,
-                      ),
-                ),
-              );
-            },
-          );
+          final friendsState = snapshot.data;
+
+          if (friendsState is LoadingFriendsState) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (friendsState is ErrorFriendsState) {
+            return Center(child: Text(friendsState.error));
+          } else if (friendsState is SuccessFriendsState) {
+            // Second StreamBuilder
+
+            return StreamBuilder<ChatsState>(
+              stream: chatsBloc.stream,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return const SizedBox();
+
+                final chatsState = snapshot.data;
+
+                if (chatsState is LoadingChatsState) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (chatsState is SuccessChatsState) {
+                  return ListView.separated(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    separatorBuilder: (_, __) {
+                      return Container(
+                        color: const Color(0xFF212121),
+                        height: 1,
+                        width: double.maxFinite,
+                        margin: const EdgeInsets.only(left: 75.0),
+                      );
+                    },
+                    itemCount: chatsState.chats.length,
+                    itemBuilder: (context, index) {
+                      final chat = chatsState.chats[index];
+                      final friend = friendsState.friends.firstWhere((e) => e.uid == chat.friend);
+
+                      return ListTile(
+                        onTap: () => Modular.to.pushNamed('/conversation', arguments: friend),
+                        leading: CustomCircleAvatar(
+                          user: friend,
+                        ),
+                        title: Text(
+                          friend.name,
+                          style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        subtitle: _messageMap(chat.messages.first),
+                        trailing: Text(
+                          chat.messages.first.timeFormatted,
+                          style: Theme.of(context).textTheme.overline!.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.normal,
+                              ),
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  return Container();
+                }
+              },
+            );
+          } else {
+            return Container();
+          }
         },
       ),
     );

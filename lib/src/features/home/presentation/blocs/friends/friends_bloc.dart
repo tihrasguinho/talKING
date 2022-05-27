@@ -1,23 +1,24 @@
-import 'dart:developer';
-
-import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:talking/src/core/domain/entities/user_entity.dart';
 import 'package:talking/src/core/others/app_exception.dart';
 import 'package:talking/src/features/home/domain/usecases/get_friends_usecase/get_friends_usecase.dart';
 import 'package:talking/src/features/home/presentation/blocs/friends/friends_event.dart';
+import 'package:talking/src/features/home/presentation/blocs/friends/friends_state.dart';
 
-class FriendsBloc extends ValueNotifier<List<UserEntity>> {
+class FriendsBloc {
   final IGetFriendsUsecase _getFriendsUsecase;
 
-  FriendsBloc(this._getFriendsUsecase) : super([]) {
-    emit(HiveFriendsEvent());
-  }
+  final _controller = BehaviorSubject<FriendsEvent>.seeded(InitialFriendsEvent());
 
-  void emit(FriendsEvent event) async {
+  FriendsBloc(this._getFriendsUsecase);
+
+  void emit(FriendsEvent event) => _controller.sink.add(event);
+
+  Stream<FriendsState> get stream => _controller.stream.switchMap(_mapEventToState);
+
+  Stream<FriendsState> _mapEventToState(FriendsEvent event) async* {
     if (event is FetchFriendsEvent) {
-      log('FetchFriendsEvent');
-
       final result = await _getFriendsUsecase();
 
       if (result.isRight()) {
@@ -27,24 +28,18 @@ class FriendsBloc extends ValueNotifier<List<UserEntity>> {
           await Hive.box<UserEntity>('friends').put(friend.uid, friend);
         }
 
-        value = friends;
+        yield SuccessFriendsState(friends);
       } else {
         final exception = result.fold((l) => l, (r) => null) as AppException;
 
-        log(exception.error);
-
-        value = [];
+        yield ErrorFriendsState(exception.error);
       }
-    } else if (event is HiveFriendsEvent) {
-      log('HiveFriendsEvent');
-
-      value = Hive.box<UserEntity>('friends').values.toList();
+    } else if (event is InitialFriendsEvent) {
+      yield SuccessFriendsState(Hive.box<UserEntity>('friends').values.toList());
     }
   }
 
-  List<UserEntity> get friends {
-    final data = value;
-
-    return data;
+  void dispose() {
+    _controller.close();
   }
 }

@@ -33,9 +33,13 @@ class _ProfilePageState extends State<ProfilePage> {
       body: Column(
         children: [
           const SizedBox(height: 24.0),
-          ValueListenableBuilder<CurrentUserState>(
-            valueListenable: bloc,
-            builder: (context, state, child) {
+          StreamBuilder<CurrentUserState>(
+            stream: bloc.stream,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return const SizedBox();
+
+              final state = snapshot.data;
+
               if (state is LoadingCurrentUserState) {
                 return const Center(child: CircularProgressIndicator());
               } else if (state is ErrorCurrentUserState) {

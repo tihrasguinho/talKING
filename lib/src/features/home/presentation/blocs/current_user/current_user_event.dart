@@ -1,3 +1,3 @@
 abstract class CurrentUserEvent {}
 
-class FetchCurrentUser extends CurrentUserEvent {}
+class FetchCurrentUserEvent extends CurrentUserEvent {}

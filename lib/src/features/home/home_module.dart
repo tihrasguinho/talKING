@@ -40,7 +40,6 @@ import 'package:talking/src/features/home/presentation/blocs/current_user/curren
 import 'package:talking/src/features/home/presentation/blocs/friends/friends_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/messages/messages_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/search/search_bloc.dart';
-import 'package:talking/src/features/home/presentation/controllers/chats_controller.dart';
 import 'package:talking/src/features/home/presentation/controllers/conversation_controller.dart';
 import 'package:talking/src/features/home/presentation/controllers/main_controller.dart';
 import 'package:talking/src/features/home/presentation/controllers/profile_controller.dart';
@@ -95,8 +94,6 @@ class HomeModule extends Module {
         Bind.lazySingleton<IGetMessagesDatasource>((i) => GetMessagesFirebaseDatasourceImp()),
         Bind.lazySingleton<IGetMessagesRepository>((i) => GetMessagesRepositoryImp(i())),
         Bind.lazySingleton<IGetMessagesUsecase>((i) => GetMessagesUsecaseImp(i())),
-
-        Bind.factory<ChatsController>((i) => ChatsController(i(), i())),
 
         // Conversation
 

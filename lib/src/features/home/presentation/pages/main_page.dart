@@ -5,6 +5,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:talking/src/features/home/domain/entities/chat_entity.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
 import 'package:talking/src/features/home/presentation/blocs/chats/chats_bloc.dart';
+import 'package:talking/src/features/home/presentation/blocs/chats/chats_event.dart';
 import 'package:talking/src/features/home/presentation/controllers/main_controller.dart';
 import 'package:talking/src/features/home/presentation/pages/friends_page.dart';
 
@@ -47,7 +48,7 @@ class _MainPageState extends State<MainPage> {
     super.initState();
 
     subscription = controller.stream().listen((messages) {
-      chatsBloc.populate(messages);
+      chatsBloc.emit(LoadChatsEvent(messages));
     });
   }
 

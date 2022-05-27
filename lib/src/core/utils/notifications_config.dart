@@ -23,6 +23,10 @@ class NotificationsConfig {
 
     log('Permission status: ${settings.authorizationStatus}');
 
+    if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+      return;
+    }
+
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'high_importance_channel',
       'High Importance Notifications',

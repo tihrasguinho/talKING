@@ -1,5 +1,5 @@
 abstract class FriendsEvent {}
 
-class FetchFriendsEvent extends FriendsEvent {}
+class InitialFriendsEvent extends FriendsEvent {}
 
-class HiveFriendsEvent extends FriendsEvent {}
+class FetchFriendsEvent extends FriendsEvent {}
