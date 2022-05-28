@@ -14,6 +14,12 @@ class UserEntity extends HiveObject {
   final String image;
   @HiveField(5)
   final int createdAt;
+  @HiveField(6)
+  final bool online;
+  @HiveField(7)
+  final int lastConnection;
+  @HiveField(8)
+  final String typingTo;
 
   UserEntity({
     required this.uid,
@@ -22,6 +28,9 @@ class UserEntity extends HiveObject {
     required this.email,
     required this.image,
     required this.createdAt,
+    required this.online,
+    required this.lastConnection,
+    required this.typingTo,
   });
 
   UserEntity copyWith({
@@ -31,6 +40,9 @@ class UserEntity extends HiveObject {
     String? email,
     String? image,
     int? createdAt,
+    bool? online,
+    int? lastConnection,
+    String? typingTo,
   }) {
     return UserEntity(
       uid: uid ?? this.uid,
@@ -39,12 +51,15 @@ class UserEntity extends HiveObject {
       email: email ?? this.email,
       image: image ?? this.image,
       createdAt: createdAt ?? this.createdAt,
+      online: online ?? this.online,
+      lastConnection: lastConnection ?? this.lastConnection,
+      typingTo: typingTo ?? this.typingTo,
     );
   }
 
   @override
   String toString() {
-    return 'UserEntity(uid: $uid, name: $name, username: $username, email: $email, image: $image, createdAt: $createdAt)';
+    return 'UserEntity(uid: $uid, name: $name, username: $username, email: $email, image: $image, createdAt: $createdAt, typingTo: $typingTo)';
   }
 
   @override
@@ -57,12 +72,19 @@ class UserEntity extends HiveObject {
         other.username == username &&
         other.email == email &&
         other.image == image &&
-        other.createdAt == createdAt;
+        other.createdAt == createdAt &&
+        other.typingTo == typingTo;
   }
 
   @override
   int get hashCode {
-    return uid.hashCode ^ name.hashCode ^ username.hashCode ^ email.hashCode ^ image.hashCode ^ createdAt.hashCode;
+    return uid.hashCode ^
+        name.hashCode ^
+        username.hashCode ^
+        email.hashCode ^
+        image.hashCode ^
+        createdAt.hashCode ^
+        typingTo.hashCode;
   }
 }
 
@@ -84,13 +106,16 @@ class UserEntityAdapter extends TypeAdapter<UserEntity> {
       email: fields[3] as String,
       image: fields[4] as String,
       createdAt: fields[5] as int,
+      online: fields[6] as bool,
+      lastConnection: fields[7] as int,
+      typingTo: fields[8] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserEntity obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.uid)
       ..writeByte(1)
@@ -102,6 +127,12 @@ class UserEntityAdapter extends TypeAdapter<UserEntity> {
       ..writeByte(4)
       ..write(obj.image)
       ..writeByte(5)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(6)
+      ..write(obj.online)
+      ..writeByte(7)
+      ..write(obj.lastConnection)
+      ..writeByte(8)
+      ..write(obj.typingTo);
   }
 }

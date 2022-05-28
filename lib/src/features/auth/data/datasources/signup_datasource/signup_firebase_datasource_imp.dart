@@ -3,10 +3,10 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:talking/src/core/data/datasources/app_datasources.dart';
+import 'package:talking/src/core/data/dtos/app_dtos.dart';
+import 'package:talking/src/core/domain/entities/app_entities.dart';
 import 'package:talking/src/core/others/app_exception.dart';
-import 'package:talking/src/core/data/dtos/user_dto.dart';
-import 'package:talking/src/core/domain/entities/user_entity.dart';
-import 'package:talking/src/features/auth/data/datasources/signup_datasource/signup_datasource.dart';
 
 class SignupFirebaseDatasourceImp implements ISignupDatasource {
   @override
@@ -28,6 +28,7 @@ class SignupFirebaseDatasourceImp implements ISignupDatasource {
         'username': username,
         'email': email,
         'image': '',
+        'online': false,
         'created_at': Timestamp.now(),
       };
 

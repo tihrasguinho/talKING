@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:talking/src/core/data/datasources/app_datasources.dart';
 import 'package:talking/src/core/others/app_exception.dart';
-import 'package:talking/src/features/auth/data/datasources/reset_password_datasource/reset_password_datasource.dart';
 
 class ResetPasswordFirebaseDatasourceImp implements IResetPasswordDatasource {
   @override

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:talking/src/core/data/dtos/app_dtos.dart';
 import 'package:talking/src/core/enums/message_type.dart';
 import 'package:talking/src/core/widgets/custom_circle_avatar.dart';
-import 'package:talking/src/features/home/data/dtos/message_dto.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
 import 'package:talking/src/features/home/presentation/blocs/chats/chats_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/chats/chats_state.dart';
@@ -67,8 +67,26 @@ class _ChatsPageState extends State<ChatsPage> {
 
                       return ListTile(
                         onTap: () => Modular.to.pushNamed('/conversation', arguments: friend),
-                        leading: CustomCircleAvatar(
-                          user: friend,
+                        leading: Stack(
+                          children: [
+                            CustomCircleAvatar(
+                              user: friend,
+                            ),
+                            Positioned(
+                              right: 6,
+                              top: 6,
+                              child: friend.online
+                                  ? Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Theme.of(context).colorScheme.secondary,
+                                      ),
+                                    )
+                                  : const SizedBox(),
+                            ),
+                          ],
                         ),
                         title: Text(
                           friend.name,
@@ -77,13 +95,46 @@ class _ChatsPageState extends State<ChatsPage> {
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
-                        subtitle: _messageMap(chat.messages.first),
-                        trailing: Text(
-                          chat.messages.first.timeFormatted,
-                          style: Theme.of(context).textTheme.overline!.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.normal,
-                              ),
+                        subtitle: _messageMap(chat.message),
+                        trailing: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              chat.time,
+                              style: Theme.of(context).textTheme.overline!.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                            ),
+                            Container(
+                              width: 18,
+                              height: 18,
+                              decoration: chat.unread == 0
+                                  ? null
+                                  : BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                              child: chat.unread == 0
+                                  ? null
+                                  : Center(
+                                      child: Text(
+                                        chat.unread.toString(),
+                                        style: Theme.of(context).textTheme.overline!.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          shadows: [
+                                            const Shadow(
+                                              color: Colors.black26,
+                                              blurRadius: 2,
+                                              offset: Offset(1, 1),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                          ],
                         ),
                       );
                     },
@@ -112,7 +163,7 @@ class _ChatsPageState extends State<ChatsPage> {
               message.isMe
                   ? Icon(
                       message.seen ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
-                      color: message.seen ? Theme.of(context).colorScheme.secondary : Colors.white70,
+                      color: message.seen ? Colors.white70 : Colors.white70,
                       size: 16,
                     )
                   : const SizedBox(),
@@ -134,7 +185,7 @@ class _ChatsPageState extends State<ChatsPage> {
               message.isMe
                   ? Icon(
                       message.seen ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
-                      color: message.seen ? Theme.of(context).colorScheme.secondary : Colors.white70,
+                      color: message.seen ? Colors.white70 : Colors.white70,
                       size: 16,
                     )
                   : const SizedBox(),

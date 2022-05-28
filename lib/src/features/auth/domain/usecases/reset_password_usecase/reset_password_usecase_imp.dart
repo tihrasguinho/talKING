@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:talking/src/core/others/app_exception.dart';
-import 'package:talking/src/features/auth/domain/repositories/reset_password_repository.dart';
-import 'package:talking/src/features/auth/domain/usecases/reset_password_usecase/reset_password_usecase.dart';
+import 'package:talking/src/core/domain/repositories/app_repositories.dart';
+import 'package:talking/src/core/domain/usecases/app_usecases.dart';
 
 class ResetPasswordUsecaseImp implements IResetPasswordUsecase {
   final IResetPasswordRepository _repository;

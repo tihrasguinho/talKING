@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:talking/src/features/home/domain/entities/chat_entity.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
 import 'package:talking/src/features/home/presentation/blocs/chats/chats_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/chats/chats_event.dart';
@@ -16,7 +15,7 @@ class MainPage extends StatefulWidget {
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   final MainController controller = Modular.get();
   final ChatsBloc chatsBloc = Modular.get();
 
@@ -39,13 +38,15 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  final allMessages = <ChatEntity>[];
-
   late StreamSubscription<List<MessageEntity>> subscription;
 
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+
+    controller.updateOnlineStatus(AppLifecycleState.resumed);
 
     subscription = controller.stream().listen((messages) {
       chatsBloc.emit(LoadChatsEvent(messages));
@@ -55,7 +56,17 @@ class _MainPageState extends State<MainPage> {
   @override
   void dispose() {
     subscription.cancel();
+
+    WidgetsBinding.instance.removeObserver(this);
+
+    controller.updateOnlineStatus(AppLifecycleState.inactive);
+
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    await controller.updateOnlineStatus(state);
   }
 
   @override
@@ -70,26 +81,32 @@ class _MainPageState extends State<MainPage> {
                   return const FriendsPage();
                 },
               ),
+              backgroundColor: Theme.of(context).primaryColor,
               child: const Icon(Icons.add_rounded),
             )
           : null,
-      bottomNavigationBar: NavigationBar(
-        height: kToolbarHeight,
-        selectedIndex: selected,
-        onDestinationSelected: setSelected,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.chat_bubble_outline_rounded),
-            selectedIcon: Icon(Icons.chat_bubble_rounded),
-            label: 'Chats',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline_rounded),
-            selectedIcon: Icon(Icons.person_rounded),
-            label: 'Profile',
-          ),
-        ],
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          indicatorColor: Theme.of(context).primaryColor,
+        ),
+        child: NavigationBar(
+          height: kToolbarHeight,
+          selectedIndex: selected,
+          onDestinationSelected: setSelected,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.chat_bubble_outline_rounded),
+              selectedIcon: Icon(Icons.chat_bubble_rounded),
+              label: 'Chats',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person_outline_rounded),
+              selectedIcon: Icon(Icons.person_rounded),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
     );
   }

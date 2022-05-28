@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:talking/src/core/others/app_exception.dart';
 import 'package:talking/src/core/params/send_message_params.dart';
-import 'package:talking/src/features/home/domain/entities/message_entity.dart';
-import 'package:talking/src/features/home/domain/repositories/send_message_repository.dart';
-import 'package:talking/src/features/home/domain/usecases/send_message_usecase/send_message_usecase.dart';
+import 'package:talking/src/core/domain/entities/app_entities.dart';
+import 'package:talking/src/core/domain/repositories/app_repositories.dart';
+import 'package:talking/src/core/domain/usecases/app_usecases.dart';
 
 class SendMessageUsecaseImp implements ISendMessageUsecase {
   final ISendMessageRepository _repository;

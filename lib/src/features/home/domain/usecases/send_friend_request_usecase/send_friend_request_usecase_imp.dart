@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:talking/src/core/others/app_exception.dart';
-import 'package:talking/src/features/home/domain/repositories/send_friend_request_repository.dart';
-import 'package:talking/src/features/home/domain/usecases/send_friend_request_usecase/send_friend_request_usecase.dart';
+import 'package:talking/src/core/domain/repositories/app_repositories.dart';
+import 'package:talking/src/core/domain/usecases/app_usecases.dart';
 
 class SendFriendRequestUsecaseImp implements ISendFriendRequestUsecase {
   final ISendFriendRequestRepository _repository;

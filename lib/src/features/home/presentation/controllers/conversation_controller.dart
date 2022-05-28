@@ -1,27 +1,70 @@
+import 'dart:convert';
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:talking/src/core/data/dtos/user_dto.dart';
-import 'package:talking/src/core/domain/entities/user_entity.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:talking/src/core/data/dtos/app_dtos.dart';
+import 'package:talking/src/core/domain/entities/app_entities.dart';
+import 'package:talking/src/core/domain/usecases/app_usecases.dart';
 import 'package:talking/src/core/others/app_exception.dart';
 import 'package:talking/src/core/params/send_message_params.dart';
-import 'package:talking/src/features/home/domain/entities/message_entity.dart';
-import 'package:talking/src/features/home/domain/usecases/send_message_usecase/send_message_usecase.dart';
 
 class ConversationController {
   final ISendMessageUsecase _sendMessageUsecase;
+  final IMarkAsSeenUsecase _markAsSeenUsecase;
+  final IDeleteMessageUsecase _deleteMessageUsecase;
+  final IUpdateTypingToUsecase _updateTypingToUsecase;
 
-  ConversationController(this._sendMessageUsecase);
+  ConversationController(
+    this._sendMessageUsecase,
+    this._markAsSeenUsecase,
+    this._deleteMessageUsecase,
+    this._updateTypingToUsecase,
+  );
+
+  Future<void> updateTypingTo(String friendUid) async {
+    final result = await _updateTypingToUsecase(friendUid);
+
+    if (result.isLeft()) {
+      final exception = result.fold((l) => l, (r) => null) as AppException;
+
+      log(exception.error, name: 'UpdateTypingToException');
+    }
+  }
+
+  Future<void> deleteMessages(List<MessageEntity> messages) async {
+    for (var message in messages) {
+      final result = await _deleteMessageUsecase(message);
+
+      if (result.isLeft()) {
+        final exception = result.fold((l) => l, (r) => null) as AppException;
+
+        log(exception.error, name: 'DeleteMessageException');
+      }
+    }
+  }
+
+  Future<void> markAsSeen(List<MessageEntity> messages) async {
+    for (var message in messages) {
+      if (!message.isMe && !message.seen) {
+        final result = await _markAsSeenUsecase(message.id);
+
+        if (result.isLeft()) {
+          final exception = result.fold((l) => l, (r) => null) as AppException;
+
+          log(exception.error, name: 'MarkAsSeenException');
+        }
+      }
+    }
+  }
 
   Future<void> sendTextMessage(String message, String friendUid) async {
     final result = await _sendMessageUsecase(SendMessageParams.text(message, friendUid));
 
-    if (result.isRight()) {
-      result.fold((l) => null, (r) => r) as TextMessageEntity;
-    } else {
+    if (result.isLeft()) {
       final exception = result.fold((l) => l, (r) => null) as AppException;
 
       log(exception.error, name: 'SendMessageException');
@@ -33,16 +76,31 @@ class ConversationController {
 
     if (pickedFile == null) return;
 
-    final image = decodeImage(await pickedFile.readAsBytes());
+    final filename = pickedFile.name;
 
-    if (image == null) return;
+    final sufix = filename.split('.').last.toLowerCase();
 
-    final aspectRatio = image.width / image.height;
+    final allowed = ['jpg', 'jpeg', 'png', 'gif'];
+
+    if (!allowed.contains(sufix)) return;
+
+    final compressed = await FlutterImageCompress.compressWithFile(
+      pickedFile.path,
+      quality: 75,
+      minWidth: 512,
+      minHeight: 512,
+    );
+
+    if (compressed == null) return;
+
+    final base64 = base64Encode(compressed);
+
+    final image = decodeImage(compressed);
 
     final result = await _sendMessageUsecase(
       SendMessageParams.image(
-        pickedFile.path,
-        aspectRatio,
+        'data:image/$sufix;base64,$base64',
+        image!.width / image.height,
         friendUid,
       ),
     );
@@ -77,11 +135,11 @@ class ConversationController {
     return data.asBroadcastStream();
   }
 
-  // Stream<UserEntity?> friendStream(String uid) {
-  //   final firestore = FirebaseFirestore.instance;
+  Stream<UserEntity> friendStream(String uid) {
+    final firestore = FirebaseFirestore.instance;
 
-  //   final stream = firestore.collection('cl_users').doc(uid).snapshots();
+    final stream = firestore.collection('cl_users').doc(uid).snapshots();
 
-  //   return stream.switchMap((value) => UserDto.fromFirestore(value)).asBroadcastStream();
-  // }
+    return stream.asyncMap((doc) => UserDto.fromFirestore(doc));
+  }
 }

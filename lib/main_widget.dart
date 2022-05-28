@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:talking/src/core/others/app_consts.dart';
+import 'package:talking/src/core/utils/app_config.dart';
 import 'package:talking/src/core/utils/navigator_key.dart';
 
 class MainWidget extends StatelessWidget {
@@ -10,25 +11,33 @@ class MainWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final config = AppConfig.of(context);
+
     Modular.setNavigatorKey(navigatorKey);
     Modular.setInitialRoute('/chats');
 
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'talKING',
-      routeInformationParser: Modular.routeInformationParser,
-      routerDelegate: Modular.routerDelegate,
-      theme: FlexThemeData.dark(
-        colorScheme: AppConsts.flexSchemeDark,
-        textTheme: GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme),
-        appBarBackground: const Color(0xFF242424),
-      ),
-      darkTheme: FlexThemeData.dark(
-        colorScheme: AppConsts.flexSchemeDark,
-        textTheme: GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme),
-        appBarBackground: const Color(0xFF242424),
-      ),
-      themeMode: ThemeMode.dark,
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      // Set the device screen size
+
+      config.setSize(Size(constraints.maxWidth, constraints.maxHeight));
+
+      return MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        title: 'talKING',
+        routeInformationParser: Modular.routeInformationParser,
+        routerDelegate: Modular.routerDelegate,
+        theme: FlexThemeData.dark(
+          colorScheme: AppConsts.flexSchemeDark,
+          textTheme: GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme),
+          appBarBackground: const Color(0xFF242424),
+        ),
+        darkTheme: FlexThemeData.dark(
+          colorScheme: AppConsts.flexSchemeDark,
+          textTheme: GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme),
+          appBarBackground: const Color(0xFF242424),
+        ),
+        themeMode: ThemeMode.dark,
+      );
+    });
   }
 }

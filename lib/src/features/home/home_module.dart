@@ -1,56 +1,24 @@
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:talking/src/features/home/data/datasources/get_current_user_datasource/get_current_user_datasource.dart';
-import 'package:talking/src/features/home/data/datasources/get_current_user_datasource/get_current_user_firebase_datasource_imp.dart';
-import 'package:talking/src/features/home/data/datasources/get_friends_datasource/get_friends_datasource.dart';
-import 'package:talking/src/features/home/data/datasources/get_friends_datasource/get_friends_firebase_datasource_imp.dart';
-import 'package:talking/src/features/home/data/datasources/get_messages_datasource/get_messages_datasource.dart';
-import 'package:talking/src/features/home/data/datasources/get_messages_datasource/get_messages_firebase_datasource_imp.dart';
-import 'package:talking/src/features/home/data/datasources/search_users_datasource/search_users_datasource.dart';
-import 'package:talking/src/features/home/data/datasources/search_users_datasource/search_users_firebase_datasource_imp.dart';
-import 'package:talking/src/features/home/data/datasources/send_friend_request_datasource/send_friend_request_datasource.dart';
-import 'package:talking/src/features/home/data/datasources/send_friend_request_datasource/send_friend_request_firebase_datasource_imp.dart';
-import 'package:talking/src/features/home/data/datasources/send_message_datasource/send_message_datasource.dart';
-import 'package:talking/src/features/home/data/datasources/send_message_datasource/send_message_firebase_datasource_imp.dart';
-import 'package:talking/src/features/home/data/repositories/get_current_user_repository_imp.dart';
-import 'package:talking/src/features/home/data/repositories/get_friends_repository_imp.dart';
-import 'package:talking/src/features/home/data/repositories/get_messages_repository_imp.dart';
-import 'package:talking/src/features/home/data/repositories/search_users_repository_imp.dart';
-import 'package:talking/src/features/home/data/repositories/send_friend_request_repository_imp.dart';
-import 'package:talking/src/features/home/data/repositories/send_message_repository_imp.dart';
-import 'package:talking/src/features/home/domain/repositories/get_current_user_repository.dart';
-import 'package:talking/src/features/home/domain/repositories/get_friends_repository.dart';
-import 'package:talking/src/features/home/domain/repositories/get_messages_repository.dart';
-import 'package:talking/src/features/home/domain/repositories/search_users_repository.dart';
-import 'package:talking/src/features/home/domain/repositories/send_friend_request_repository.dart';
-import 'package:talking/src/features/home/domain/repositories/send_message_repository.dart';
-import 'package:talking/src/features/home/domain/usecases/get_current_user_usecase/get_current_user_usecase.dart';
-import 'package:talking/src/features/home/domain/usecases/get_current_user_usecase/get_current_user_usecase_imp.dart';
-import 'package:talking/src/features/home/domain/usecases/get_friends_usecase/get_friends_usecase.dart';
-import 'package:talking/src/features/home/domain/usecases/get_friends_usecase/get_friends_usecase_imp.dart';
-import 'package:talking/src/features/home/domain/usecases/get_messages_usecase/get_messages_usecase.dart';
-import 'package:talking/src/features/home/domain/usecases/get_messages_usecase/get_messages_usecase_imp.dart';
-import 'package:talking/src/features/home/domain/usecases/search_users_usecase/search_users_usecase.dart';
-import 'package:talking/src/features/home/domain/usecases/search_users_usecase/search_users_usecase_imp.dart';
-import 'package:talking/src/features/home/domain/usecases/send_friend_request_usecase/send_friend_request_usecase.dart';
-import 'package:talking/src/features/home/domain/usecases/send_friend_request_usecase/send_friend_request_usecase_imp.dart';
-import 'package:talking/src/features/home/domain/usecases/send_message_usecase/send_message_usecase.dart';
-import 'package:talking/src/features/home/domain/usecases/send_message_usecase/send_message_usecase_imp.dart';
-import 'package:talking/src/features/home/presentation/blocs/chats/chats_bloc.dart';
-import 'package:talking/src/features/home/presentation/blocs/current_user/current_user_bloc.dart';
-import 'package:talking/src/features/home/presentation/blocs/friends/friends_bloc.dart';
-import 'package:talking/src/features/home/presentation/blocs/messages/messages_bloc.dart';
-import 'package:talking/src/features/home/presentation/blocs/search/search_bloc.dart';
-import 'package:talking/src/features/home/presentation/controllers/conversation_controller.dart';
-import 'package:talking/src/features/home/presentation/controllers/main_controller.dart';
-import 'package:talking/src/features/home/presentation/controllers/profile_controller.dart';
-import 'package:talking/src/features/home/presentation/controllers/search_controller.dart';
-import 'package:talking/src/features/home/presentation/pages/conversation_page.dart';
-import 'package:talking/src/features/home/presentation/pages/main_page.dart';
-import 'package:talking/src/features/home/presentation/pages/chats_page.dart';
-import 'package:talking/src/features/home/presentation/pages/feed_page.dart';
-import 'package:talking/src/features/home/presentation/pages/home_page.dart';
-import 'package:talking/src/features/home/presentation/pages/profile_page.dart';
-import 'package:talking/src/features/home/presentation/pages/search_page.dart';
+import 'package:talking/src/core/data/datasources/app_datasources.dart';
+import 'package:talking/src/core/domain/repositories/app_repositories.dart';
+import 'package:talking/src/core/domain/usecases/app_usecases.dart';
+
+import 'presentation/blocs/chats/chats_bloc.dart';
+import 'presentation/blocs/current_user/current_user_bloc.dart';
+import 'presentation/blocs/friends/friends_bloc.dart';
+import 'presentation/blocs/messages/messages_bloc.dart';
+import 'presentation/blocs/search/search_bloc.dart';
+import 'presentation/controllers/conversation_controller.dart';
+import 'presentation/controllers/main_controller.dart';
+import 'presentation/controllers/profile_controller.dart';
+import 'presentation/controllers/search_controller.dart';
+import 'presentation/pages/chats_page.dart';
+import 'presentation/pages/conversation_page.dart';
+import 'presentation/pages/feed_page.dart';
+import 'presentation/pages/home_page.dart';
+import 'presentation/pages/main_page.dart';
+import 'presentation/pages/profile_page.dart';
+import 'presentation/pages/search_page.dart';
 
 class HomeModule extends Module {
   @override
@@ -95,11 +63,35 @@ class HomeModule extends Module {
         Bind.lazySingleton<IGetMessagesRepository>((i) => GetMessagesRepositoryImp(i())),
         Bind.lazySingleton<IGetMessagesUsecase>((i) => GetMessagesUsecaseImp(i())),
 
+        // Update Online Status
+
+        Bind.lazySingleton<IUpdateOnlineStatusDatasource>((i) => UpdateOnlineStatusFirebaseDatasourceImp()),
+        Bind.lazySingleton<IUpdateOnlineStatusRepository>((i) => UpdateOnlineStatusRepositoryImp(i())),
+        Bind.lazySingleton<IUpdateOnlineStatusUsecase>((i) => UpdateOnlineStatusUsecaseImp(i())),
+
+        // Mark As Seen
+
+        Bind.lazySingleton<IMarkAsSeenDatasource>((i) => MarkAsSeenFirebaseDatasourceImp()),
+        Bind.lazySingleton<IMarkAsSeenRepository>((i) => MarkAsSeenRepositoryImp(i())),
+        Bind.lazySingleton<IMarkAsSeenUsecase>((i) => MarkAsSeenUsecaseImp(i())),
+
+        // Delete Message
+
+        Bind.lazySingleton<IDeleteMessageDatasource>((i) => DeleteMessageFirebaseDatasourceImp()),
+        Bind.lazySingleton<IDeleteMessageRepository>((i) => DeleteMessageRepositoryImp(i())),
+        Bind.lazySingleton<IDeleteMessageUsecase>((i) => DeleteMessageUsecaseImp(i())),
+
+        // Update Typing To
+
+        Bind.lazySingleton<IUpdateTypingToDatasource>((i) => UpdateTypingToFirebaseDatasourceImp()),
+        Bind.lazySingleton<IUpdateTypingToRepository>((i) => UpdateTypingToRepositoryImp(i())),
+        Bind.lazySingleton<IUpdateTypingToUsecase>((i) => UpdateTypingToUsecaseImp(i())),
+
         // Conversation
 
         Bind.factory<MessagesBloc>((i) => MessagesBloc()),
 
-        Bind.factory<ConversationController>((i) => ConversationController(i())),
+        Bind.factory<ConversationController>((i) => ConversationController(i(), i(), i(), i())),
 
         Bind.factory<SearchController>((i) => SearchController(i())),
 
@@ -107,7 +99,7 @@ class HomeModule extends Module {
 
         Bind.lazySingleton<ChatsBloc>((i) => ChatsBloc(), onDispose: (bloc) => bloc.dispose()),
 
-        Bind.factory<MainController>((i) => MainController()),
+        Bind.factory<MainController>((i) => MainController(i())),
       ];
 
   @override

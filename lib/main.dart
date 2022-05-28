@@ -7,6 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:talking/main_module.dart';
 import 'package:talking/main_widget.dart';
 import 'package:talking/src/core/domain/entities/user_entity.dart';
+import 'package:talking/src/core/utils/app_config.dart';
 import 'package:talking/src/core/utils/notifications_config.dart';
 
 import 'firebase_options.dart';
@@ -32,5 +33,5 @@ Future<void> main() async {
 
   await initializeDateFormatting('en_US');
 
-  runApp(ModularApp(module: MainModule(), child: const MainWidget()));
+  runApp(ModularApp(module: MainModule(), child: AppConfig(const MainWidget())));
 }

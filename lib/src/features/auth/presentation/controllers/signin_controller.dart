@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:talking/src/core/others/app_exception.dart';
 import 'package:talking/src/core/others/app_snackbars.dart';
 import 'package:talking/src/core/domain/entities/user_entity.dart';
@@ -17,6 +18,8 @@ class SigninController {
       final user = result.fold((l) => null, (r) => r) as UserEntity;
 
       log(user.toString(), name: 'signInSuccess');
+
+      return Modular.to.navigate('/');
     } else {
       final exception = result.fold((l) => l, (r) => null) as AppException;
 

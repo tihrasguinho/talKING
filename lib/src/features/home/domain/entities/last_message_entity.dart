@@ -1,5 +1,4 @@
-import 'package:talking/src/core/domain/entities/user_entity.dart';
-import 'package:talking/src/features/home/domain/entities/message_entity.dart';
+import 'package:talking/src/core/domain/entities/app_entities.dart';
 
 class LastMessageEntity {
   final UserEntity user;

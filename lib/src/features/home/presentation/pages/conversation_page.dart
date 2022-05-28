@@ -4,10 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:talking/src/core/data/dtos/app_dtos.dart';
 import 'package:talking/src/core/domain/entities/user_entity.dart';
 import 'package:talking/src/core/enums/message_type.dart';
+import 'package:talking/src/core/utils/app_config.dart';
 import 'package:talking/src/core/widgets/custom_circle_avatar.dart';
-import 'package:talking/src/features/home/data/dtos/message_dto.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
 import 'package:talking/src/features/home/presentation/blocs/messages/messages_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/messages/messages_event.dart';
@@ -27,6 +28,8 @@ class _ConversationPageState extends State<ConversationPage> {
   final ConversationController controller = Modular.get();
   final MessagesBloc bloc = Modular.get();
 
+  final selected = <MessageEntity>[];
+
   final firestore = FirebaseFirestore.instance;
 
   final input = TextEditingController();
@@ -35,13 +38,29 @@ class _ConversationPageState extends State<ConversationPage> {
 
   late StreamSubscription<List<QueryDocumentSnapshot<Map<String, dynamic>>>> subscription;
 
-  // late StreamSubscription<QueryDocumentSnapshot<Map<String, dynamic>>> friendSubscription;
+  void addToSelected(MessageEntity message) {
+    setState(() {
+      selected.add(message);
+    });
+  }
+
+  void clearSelected() {
+    setState(() {
+      selected.clear();
+    });
+  }
 
   @override
   void initState() {
     super.initState();
 
-    // friendSubscription = Firebase
+    input.addListener(() {
+      if (input.text.isNotEmpty) {
+        controller.updateTypingTo(widget.friend.uid);
+      } else {
+        controller.updateTypingTo('');
+      }
+    });
 
     subscription = controller.stream(hive.get('uid'), widget.friend.uid).listen((event) {
       bloc.emit(LoadMessagesEvent(event));
@@ -52,34 +71,65 @@ class _ConversationPageState extends State<ConversationPage> {
   void dispose() {
     input.dispose();
     subscription.cancel();
+    controller.updateTypingTo('');
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final config = AppConfig.of(context);
+
     return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 0.0,
-        title: Row(
-          children: [
-            CustomCircleAvatar(
-              user: widget.friend,
-              size: const Size(32, 32),
-            ),
-            const SizedBox(width: 8.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(widget.friend.name),
-                // Text(
-                //   'Online',
-                //   style: Theme.of(context).textTheme.overline!.copyWith(
-                //         color: Colors.white70,
-                //       ),
-                // ),
-              ],
-            ),
-          ],
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: StreamBuilder<UserEntity>(
+          stream: controller.friendStream(widget.friend.uid),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) return Container();
+
+            final friend = snapshot.data;
+
+            return AppBar(
+              titleSpacing: 0.0,
+              title: Row(
+                children: [
+                  CustomCircleAvatar(
+                    user: friend!,
+                    size: const Size(32, 32),
+                  ),
+                  const SizedBox(width: 8.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(friend.name),
+                      Text(
+                        friend.typingTo.isNotEmpty
+                            ? 'Typing...'
+                            : friend.online
+                                ? 'Online'
+                                : friend.lastConnectionFormatted,
+                        style: Theme.of(context).textTheme.overline!.copyWith(
+                              color: Colors.white70,
+                            ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: selected.isEmpty
+                  ? null
+                  : selected.every((e) => e.from == hive.get('uid'))
+                      ? [
+                          IconButton(
+                            onPressed: () async {
+                              await controller.deleteMessages(selected).whenComplete(() => clearSelected());
+                            },
+                            icon: const Icon(Icons.delete_forever_rounded),
+                          ),
+                        ]
+                      : null,
+            );
+          },
         ),
       ),
       body: Column(
@@ -97,6 +147,8 @@ class _ConversationPageState extends State<ConversationPage> {
                 } else if (state is ErrorMessagesState) {
                   return Center(child: Text(state.error));
                 } else if (state is SuccessMessagesState) {
+                  controller.markAsSeen(state.messages);
+
                   return ListView.builder(
                     reverse: true,
                     physics: const BouncingScrollPhysics(),
@@ -111,57 +163,66 @@ class _ConversationPageState extends State<ConversationPage> {
                           {
                             message as TextMessageEntity;
 
-                            return Align(
-                              alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 24.0,
-                                  vertical: 4.0,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0,
-                                  vertical: 8.0,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isMe
-                                      ? Theme.of(context).colorScheme.secondaryContainer
-                                      : Theme.of(context).appBarTheme.backgroundColor,
-                                  borderRadius: BorderRadius.circular(16.0),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      message.message,
-                                      style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                                            color: Colors.white,
-                                          ),
+                            return Container(
+                              color: selected.contains(message)
+                                  ? Theme.of(context).primaryColor.withOpacity(0.3)
+                                  : Colors.transparent,
+                              child: Align(
+                                alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                                child: GestureDetector(
+                                  onLongPress: () => addToSelected(message),
+                                  child: Container(
+                                    key: ValueKey(message.id),
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 24.0,
+                                      vertical: 4.0,
                                     ),
-                                    const SizedBox(height: 4.0),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
+                                    padding: const EdgeInsets.only(
+                                      left: 24.0,
+                                      right: 16.0,
+                                      top: 8.0,
+                                      bottom: 8.0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isMe
+                                          ? Theme.of(context).primaryColor
+                                          : Theme.of(context).appBarTheme.backgroundColor,
+                                      borderRadius: BorderRadius.circular(16.0),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
                                         Text(
-                                          message.timeFormatted,
-                                          style: Theme.of(context).textTheme.overline!.copyWith(
+                                          message.message,
+                                          style: Theme.of(context).textTheme.subtitle1!.copyWith(
                                                 color: Colors.white,
                                               ),
                                         ),
-                                        message.isMe ? const SizedBox(width: 4.0) : const SizedBox(),
-                                        message.isMe
-                                            ? Icon(
-                                                message.seen
-                                                    ? Icons.check_circle_rounded
-                                                    : Icons.check_circle_outline_rounded,
-                                                color: message.seen
-                                                    ? Theme.of(context).colorScheme.secondary
-                                                    : Colors.white70,
-                                                size: 16,
-                                              )
-                                            : const SizedBox(),
+                                        const SizedBox(height: 4.0),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              message.timeFormatted,
+                                              style: Theme.of(context).textTheme.overline!.copyWith(
+                                                    color: Colors.white,
+                                                  ),
+                                            ),
+                                            message.isMe ? const SizedBox(width: 4.0) : const SizedBox(),
+                                            message.isMe
+                                                ? Icon(
+                                                    message.seen
+                                                        ? Icons.check_circle_rounded
+                                                        : Icons.check_circle_outline_rounded,
+                                                    color: message.seen ? Colors.white70 : Colors.white70,
+                                                    size: 16,
+                                                  )
+                                                : const SizedBox(),
+                                          ],
+                                        ),
                                       ],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             );
@@ -174,8 +235,8 @@ class _ConversationPageState extends State<ConversationPage> {
                               alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                               child: Padding(
                                 padding: EdgeInsets.only(
-                                  right: isMe ? 24.0 : 75.0,
-                                  left: isMe ? 75.0 : 24.0,
+                                  right: isMe ? 24.0 : config.size.width * 0.5,
+                                  left: isMe ? config.size.width * 0.5 : 24.0,
                                   top: 4.0,
                                   bottom: 4.0,
                                 ),
@@ -185,7 +246,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                     clipBehavior: Clip.antiAlias,
                                     decoration: BoxDecoration(
                                       color: isMe
-                                          ? Theme.of(context).colorScheme.secondaryContainer
+                                          ? Theme.of(context).primaryColor
                                           : Theme.of(context).appBarTheme.backgroundColor,
                                       borderRadius: BorderRadius.circular(16.0),
                                     ),
@@ -220,9 +281,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                                         message.seen
                                                             ? Icons.check_circle_rounded
                                                             : Icons.check_circle_outline_rounded,
-                                                        color: message.seen
-                                                            ? Theme.of(context).colorScheme.secondary
-                                                            : Colors.white70,
+                                                        color: message.seen ? Colors.white70 : Colors.white70,
                                                         size: 16,
                                                       )
                                                     : const SizedBox(),

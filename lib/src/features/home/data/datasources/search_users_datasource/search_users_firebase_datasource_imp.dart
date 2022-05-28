@@ -1,10 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:talking/src/core/data/dtos/user_dto.dart';
+import 'package:talking/src/core/data/datasources/app_datasources.dart';
+import 'package:talking/src/core/data/dtos/app_dtos.dart';
+import 'package:talking/src/core/domain/entities/app_entities.dart';
 import 'package:talking/src/core/others/app_exception.dart';
-import 'package:talking/src/core/domain/entities/user_entity.dart';
-import 'package:talking/src/features/home/data/datasources/search_users_datasource/search_users_datasource.dart';
 
 class SearchUsersFirebaseDatasourceImp implements ISearchUsersDatasource {
   @override

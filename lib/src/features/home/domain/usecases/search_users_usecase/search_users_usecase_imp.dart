@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:talking/src/core/others/app_exception.dart';
-import 'package:talking/src/core/domain/entities/user_entity.dart';
-import 'package:talking/src/features/home/domain/repositories/search_users_repository.dart';
-import 'package:talking/src/features/home/domain/usecases/search_users_usecase/search_users_usecase.dart';
+import 'package:talking/src/core/domain/entities/app_entities.dart';
+import 'package:talking/src/core/domain/repositories/app_repositories.dart';
+import 'package:talking/src/core/domain/usecases/app_usecases.dart';
 
 class SearchUsersUsecaseImp implements ISearchUsersUsecase {
   final ISearchUsersRepository _repository;

@@ -31,11 +31,11 @@ class SendMessageParams {
     );
   }
 
-  factory SendMessageParams.image(String imagePath, double aspectRatio, String friendUid) {
+  factory SendMessageParams.image(String image, double aspectRatio, String friendUid) {
     return SendMessageParams(
       message: '',
       to: friendUid,
-      image: imagePath,
+      image: image,
       aspectRatio: aspectRatio,
       audio: '',
       video: '',

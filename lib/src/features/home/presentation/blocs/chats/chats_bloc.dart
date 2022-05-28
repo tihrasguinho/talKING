@@ -30,12 +30,18 @@ class ChatsBloc {
 
         filtered.sort((a, b) => b.time.compareTo(a.time));
 
-        final chat = ChatEntity(friend: friend, messages: filtered);
+        final unread = filtered.where((e) => e.from == friend && e.seen == false).toList();
+
+        final chat = ChatEntity(
+          friend: friend,
+          message: filtered.first,
+          unread: unread.length,
+        );
 
         chats.add(chat);
       }
 
-      chats.sort((a, b) => b.messages.first.time.compareTo(a.messages.first.time));
+      chats.sort((a, b) => b.message.time.compareTo(a.message.time));
 
       yield SuccessChatsState(chats);
     }

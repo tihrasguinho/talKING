@@ -1,27 +1,12 @@
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:talking/src/features/auth/data/datasources/reset_password_datasource/reset_password_datasource.dart';
-import 'package:talking/src/features/auth/data/datasources/reset_password_datasource/reset_password_firebase_datasource_imp.dart';
-import 'package:talking/src/features/auth/data/datasources/signin_datasource/signin_datasource.dart';
-import 'package:talking/src/features/auth/data/datasources/signin_datasource/signin_firebase_datasource_imp.dart';
-import 'package:talking/src/features/auth/data/datasources/signup_datasource/signup_datasource.dart';
-import 'package:talking/src/features/auth/data/datasources/signup_datasource/signup_firebase_datasource_imp.dart';
-import 'package:talking/src/features/auth/data/repositories/reset_password_repository_imp.dart';
-import 'package:talking/src/features/auth/data/repositories/signin_repository_imp.dart';
-import 'package:talking/src/features/auth/data/repositories/signup_repository_imp.dart';
-import 'package:talking/src/features/auth/domain/repositories/reset_password_repository.dart';
-import 'package:talking/src/features/auth/domain/repositories/signin_repository.dart';
-import 'package:talking/src/features/auth/domain/repositories/signup_repository.dart';
-import 'package:talking/src/features/auth/domain/usecases/reset_password_usecase/reset_password_usecase.dart';
-import 'package:talking/src/features/auth/domain/usecases/reset_password_usecase/reset_password_usecase_imp.dart';
-import 'package:talking/src/features/auth/domain/usecases/signin_usecase/signin_usecase.dart';
-import 'package:talking/src/features/auth/domain/usecases/signin_usecase/signin_usecase_imp.dart';
-import 'package:talking/src/features/auth/domain/usecases/signup_usecase/signup_usecase.dart';
-import 'package:talking/src/features/auth/domain/usecases/signup_usecase/signup_usecase_imp.dart';
-import 'package:talking/src/features/auth/presentation/controllers/reset_password_controller.dart';
-import 'package:talking/src/features/auth/presentation/controllers/signin_controller.dart';
-import 'package:talking/src/features/auth/presentation/controllers/signup_controller.dart';
-import 'package:talking/src/features/auth/presentation/pages/reset_password_page.dart';
+import 'package:talking/src/core/data/datasources/app_datasources.dart';
+import 'package:talking/src/core/domain/repositories/app_repositories.dart';
+import 'package:talking/src/core/domain/usecases/app_usecases.dart';
 
+import 'presentation/controllers/reset_password_controller.dart';
+import 'presentation/controllers/signin_controller.dart';
+import 'presentation/controllers/signup_controller.dart';
+import 'presentation/pages/reset_password_page.dart';
 import 'presentation/pages/signin_page.dart';
 import 'presentation/pages/signup_page.dart';
 

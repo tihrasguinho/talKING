@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:talking/src/core/others/app_exception.dart';
-import 'package:talking/src/features/home/domain/entities/message_entity.dart';
-import 'package:talking/src/features/home/domain/repositories/get_messages_repository.dart';
-import 'package:talking/src/features/home/domain/usecases/get_messages_usecase/get_messages_usecase.dart';
+import 'package:talking/src/core/domain/entities/app_entities.dart';
+import 'package:talking/src/core/domain/repositories/app_repositories.dart';
+import 'package:talking/src/core/domain/usecases/app_usecases.dart';
 
 class GetMessagesUsecaseImp implements IGetMessagesUsecase {
   final IGetMessagesRepository _repository;

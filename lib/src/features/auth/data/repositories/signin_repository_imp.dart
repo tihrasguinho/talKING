@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
+import 'package:talking/src/core/domain/entities/app_entities.dart';
 import 'package:talking/src/core/others/app_exception.dart';
-import 'package:talking/src/features/auth/data/datasources/signin_datasource/signin_datasource.dart';
-import 'package:talking/src/core/domain/entities/user_entity.dart';
-import 'package:talking/src/features/auth/domain/repositories/signin_repository.dart';
+import 'package:talking/src/core/data/datasources/app_datasources.dart';
+import 'package:talking/src/core/domain/repositories/app_repositories.dart';
 
 class SigninRepositoryImp implements ISigninRepository {
   final ISigninDatasource _datasource;

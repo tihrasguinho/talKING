@@ -1,14 +1,12 @@
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:talking/src/core/data/datasources/app_datasources.dart';
+import 'package:talking/src/core/domain/entities/app_entities.dart';
 import 'package:talking/src/core/enums/message_type.dart';
 import 'package:talking/src/core/others/app_exception.dart';
 import 'package:talking/src/core/params/send_message_params.dart';
-import 'package:talking/src/features/home/data/datasources/send_message_datasource/send_message_datasource.dart';
-import 'package:talking/src/features/home/domain/entities/message_entity.dart';
 
 class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
   @override
@@ -54,11 +52,12 @@ class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
           }
         case MessageType.image:
           {
-            final sufix = params.image.split('/').last.split('.').last.toUpperCase();
+            final name = '$uid-${DateTime.now().toUtc().toIso8601String()}';
 
-            final name = '$uid-${DateTime.now().toUtc().toIso8601String()}.$sufix';
-
-            final upload = await storage.ref().child(uid).child(name).putFile(File(params.image));
+            final upload = await storage.ref().child(uid).child(name).putString(
+                  params.image,
+                  format: PutStringFormat.dataUrl,
+                );
 
             final url = await upload.ref.getDownloadURL();
 

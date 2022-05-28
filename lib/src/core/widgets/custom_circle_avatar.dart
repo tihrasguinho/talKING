@@ -21,7 +21,7 @@ class CustomCircleAvatar extends StatelessWidget {
       width: size.width,
       height: size.height,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiaryContainer,
+        color: Theme.of(context).primaryColor,
         shape: BoxShape.circle,
         image: user.image.isEmpty
             ? null
@@ -36,7 +36,7 @@ class CustomCircleAvatar extends StatelessWidget {
                 _sufix(),
                 style: Theme.of(context).textTheme.headline5!.copyWith(
                       color: Colors.white,
-                      fontSize: size.width * 0.5,
+                      fontSize: size.width * 0.35,
                     ),
               ),
             )
