@@ -35,9 +35,13 @@ class _ConversationPageState extends State<ConversationPage> {
 
   late StreamSubscription<List<QueryDocumentSnapshot<Map<String, dynamic>>>> subscription;
 
+  // late StreamSubscription<QueryDocumentSnapshot<Map<String, dynamic>>> friendSubscription;
+
   @override
   void initState() {
     super.initState();
+
+    // friendSubscription = Firebase
 
     subscription = controller.stream(hive.get('uid'), widget.friend.uid).listen((event) {
       bloc.emit(LoadMessagesEvent(event));
@@ -133,11 +137,29 @@ class _ConversationPageState extends State<ConversationPage> {
                                             color: Colors.white,
                                           ),
                                     ),
-                                    Text(
-                                      message.timeFormatted,
-                                      style: Theme.of(context).textTheme.overline!.copyWith(
-                                            color: Colors.white,
-                                          ),
+                                    const SizedBox(height: 4.0),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          message.timeFormatted,
+                                          style: Theme.of(context).textTheme.overline!.copyWith(
+                                                color: Colors.white,
+                                              ),
+                                        ),
+                                        message.isMe ? const SizedBox(width: 4.0) : const SizedBox(),
+                                        message.isMe
+                                            ? Icon(
+                                                message.seen
+                                                    ? Icons.check_circle_rounded
+                                                    : Icons.check_circle_outline_rounded,
+                                                color: message.seen
+                                                    ? Theme.of(context).colorScheme.secondary
+                                                    : Colors.white70,
+                                                size: 16,
+                                              )
+                                            : const SizedBox(),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -183,11 +205,28 @@ class _ConversationPageState extends State<ConversationPage> {
                                               horizontal: 16.0,
                                               vertical: 8.0,
                                             ),
-                                            child: Text(
-                                              message.timeFormatted,
-                                              style: Theme.of(context).textTheme.overline!.copyWith(
-                                                    color: Colors.white,
-                                                  ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  message.timeFormatted,
+                                                  style: Theme.of(context).textTheme.overline!.copyWith(
+                                                        color: Colors.white,
+                                                      ),
+                                                ),
+                                                message.isMe ? const SizedBox(width: 4.0) : const SizedBox(),
+                                                message.isMe
+                                                    ? Icon(
+                                                        message.seen
+                                                            ? Icons.check_circle_rounded
+                                                            : Icons.check_circle_outline_rounded,
+                                                        color: message.seen
+                                                            ? Theme.of(context).colorScheme.secondary
+                                                            : Colors.white70,
+                                                        size: 16,
+                                                      )
+                                                    : const SizedBox(),
+                                              ],
                                             ),
                                           ),
                                         ),

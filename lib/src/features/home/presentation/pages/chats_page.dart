@@ -107,18 +107,38 @@ class _ChatsPageState extends State<ChatsPage> {
         {
           message as TextMessageEntity;
 
-          return Text(
-            message.message,
-            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  color: Colors.white70,
-                  fontWeight: FontWeight.normal,
-                ),
+          return Row(
+            children: [
+              message.isMe
+                  ? Icon(
+                      message.seen ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
+                      color: message.seen ? Theme.of(context).colorScheme.secondary : Colors.white70,
+                      size: 16,
+                    )
+                  : const SizedBox(),
+              message.isMe ? const SizedBox(width: 4.0) : const SizedBox(),
+              Text(
+                message.message,
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: Colors.white70,
+                      fontWeight: FontWeight.normal,
+                    ),
+              ),
+            ],
           );
         }
       case MessageType.image:
         {
           return Row(
             children: [
+              message.isMe
+                  ? Icon(
+                      message.seen ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
+                      color: message.seen ? Theme.of(context).colorScheme.secondary : Colors.white70,
+                      size: 16,
+                    )
+                  : const SizedBox(),
+              message.isMe ? const SizedBox(width: 4.0) : const SizedBox(),
               const Icon(
                 Icons.image_rounded,
                 color: Colors.white70,
@@ -139,6 +159,14 @@ class _ChatsPageState extends State<ChatsPage> {
         {
           return Row(
             children: [
+              message.isMe
+                  ? Icon(
+                      message.seen ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
+                      color: message.seen ? Theme.of(context).colorScheme.secondary : Colors.white70,
+                      size: 16,
+                    )
+                  : const SizedBox(),
+              message.isMe ? const SizedBox(width: 4.0) : const SizedBox(),
               const Icon(
                 Icons.mic_rounded,
                 color: Colors.white70,
@@ -159,6 +187,14 @@ class _ChatsPageState extends State<ChatsPage> {
         {
           return Row(
             children: [
+              message.isMe
+                  ? Icon(
+                      message.seen ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
+                      color: message.seen ? Theme.of(context).colorScheme.secondary : Colors.white70,
+                      size: 16,
+                    )
+                  : const SizedBox(),
+              message.isMe ? const SizedBox(width: 4.0) : const SizedBox(),
               const Icon(
                 Icons.video_camera_back_rounded,
                 color: Colors.white70,

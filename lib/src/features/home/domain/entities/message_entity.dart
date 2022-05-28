@@ -6,6 +6,7 @@ abstract class MessageEntity {
   final String to;
   final MessageType type;
   final DateTime time;
+  final bool seen;
 
   MessageEntity({
     required this.id,
@@ -13,6 +14,7 @@ abstract class MessageEntity {
     required this.to,
     required this.type,
     required this.time,
+    required this.seen,
   });
 }
 
@@ -26,6 +28,7 @@ class TextMessageEntity extends MessageEntity {
     required super.to,
     required super.type,
     required super.time,
+    required super.seen,
   });
 
   @override
@@ -54,6 +57,7 @@ class ImageMessageEntity extends MessageEntity {
     required super.to,
     required super.type,
     required super.time,
+    required super.seen,
   });
 
   @override

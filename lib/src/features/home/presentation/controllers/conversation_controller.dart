@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image/image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:talking/src/core/data/dtos/user_dto.dart';
+import 'package:talking/src/core/domain/entities/user_entity.dart';
 import 'package:talking/src/core/others/app_exception.dart';
 import 'package:talking/src/core/params/send_message_params.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
@@ -74,4 +76,12 @@ class ConversationController {
 
     return data.asBroadcastStream();
   }
+
+  // Stream<UserEntity?> friendStream(String uid) {
+  //   final firestore = FirebaseFirestore.instance;
+
+  //   final stream = firestore.collection('cl_users').doc(uid).snapshots();
+
+  //   return stream.switchMap((value) => UserDto.fromFirestore(value)).asBroadcastStream();
+  // }
 }

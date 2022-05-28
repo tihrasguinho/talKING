@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:talking/src/core/enums/message_type.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
@@ -18,6 +19,7 @@ extension MessageDto on MessageEntity {
       to: data['to'] ?? '',
       type: MessageType.values.singleWhere((e) => e.desc == data['type']),
       time: DateTime.fromMillisecondsSinceEpoch(time.millisecondsSinceEpoch),
+      seen: data['seen'] ?? false,
     );
   }
 
@@ -31,6 +33,7 @@ extension MessageDto on MessageEntity {
       to: data['to'] ?? '',
       type: MessageType.text,
       time: DateTime.parse(data['time']),
+      seen: data['seen'] ?? false,
     );
   }
 
@@ -62,6 +65,7 @@ extension MessageDto on MessageEntity {
       to: data['to'] ?? '',
       type: MessageType.values.singleWhere((e) => e.desc == data['type']),
       time: DateTime.fromMillisecondsSinceEpoch(time.millisecondsSinceEpoch),
+      seen: data['seen'] ?? false,
     );
   }
 
@@ -70,4 +74,6 @@ extension MessageDto on MessageEntity {
 
     return formatter.format(time);
   }
+
+  bool get isMe => Hive.box('app').get('uid') == from;
 }

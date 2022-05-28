@@ -35,6 +35,7 @@ class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
               'to': params.to,
               'type': params.type.desc,
               'time': time,
+              'seen': false,
             };
 
             final doc = await firestore.collection('cl_messages').add(message);
@@ -47,6 +48,7 @@ class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
                 to: params.to,
                 type: params.type,
                 time: DateTime.fromMillisecondsSinceEpoch(time.millisecondsSinceEpoch),
+                seen: false,
               ),
             );
           }
@@ -67,6 +69,7 @@ class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
               'aspect_ratio': params.aspectRatio,
               'type': params.type.desc,
               'time': time,
+              'seen': false,
             };
 
             final doc = await firestore.collection('cl_messages').add(message);
@@ -80,6 +83,7 @@ class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
                 to: params.to,
                 type: params.type,
                 time: DateTime.fromMillisecondsSinceEpoch(time.millisecondsSinceEpoch),
+                seen: false,
               ),
             );
           }
@@ -106,6 +110,7 @@ class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
                 to: params.to,
                 type: params.type,
                 time: DateTime.fromMillisecondsSinceEpoch(time.millisecondsSinceEpoch),
+                seen: false,
               ),
             );
           }
@@ -132,6 +137,7 @@ class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
                 to: params.to,
                 type: params.type,
                 time: DateTime.fromMillisecondsSinceEpoch(time.millisecondsSinceEpoch),
+                seen: false,
               ),
             );
           }
@@ -158,6 +164,7 @@ class SendMessageFirebaseDatasourceImp implements ISendMessageDatasource {
                 to: params.to,
                 type: params.type,
                 time: DateTime.fromMillisecondsSinceEpoch(time.millisecondsSinceEpoch),
+                seen: false,
               ),
             );
           }
