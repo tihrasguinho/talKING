@@ -66,7 +66,7 @@ class _ChatsPageState extends State<ChatsPage> {
                       final friend = friendsState.friends.firstWhere((e) => e.uid == chat.friend);
 
                       return ListTile(
-                        onTap: () => Modular.to.pushNamed('/conversation', arguments: friend),
+                        onTap: () => Modular.to.pushNamed('/conversation/${friend.uid}', arguments: friend.uid),
                         leading: Stack(
                           children: [
                             CustomCircleAvatar(

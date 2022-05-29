@@ -7,6 +7,42 @@ const firestore = admin.firestore();
 
 const messaging = admin.messaging();
 
+exports.notifyNewMessage = functions.firestore.document('cl_messages/{docId}').onCreate(async (snapshot, context) => {
+    const data = snapshot.data();
+
+    const to = (await firestore.collection('cl_users').doc(data.to).get()).data();
+
+    if (to.token !== '') {
+
+        const from = (await firestore.collection('cl_users').doc(data.from).get()).data();
+
+        const type = data.type;
+
+        const notification = {
+            title: from.name,
+            body: type === 'text' ? data.message : type === 'image' ? 'Image' : type === 'audio' ? 'Audio' : 'Video',
+            image: from.image,
+        };
+
+        const payload = {
+            notification: JSON.stringify(notification),
+            message: JSON.stringify(data),
+        };
+
+        const message = {
+            data: payload,
+        };
+
+        const options = {
+            contentAvailable: true,
+            priority: 'high'
+        };
+
+        await messaging.sendToDevice(to.token, message, options);
+
+    }
+});
+
 exports.notifyFriendRequest = functions.firestore.document('cl_requests/{docId}').onCreate(async (snapshot, context) => {
     const snap = snapshot.data();
 

@@ -124,8 +124,8 @@ class HomeModule extends Module {
           transition: TransitionType.rightToLeftWithFade,
         ),
         ChildRoute(
-          '/conversation',
-          child: (_, args) => ConversationPage(friend: args.data),
+          '/conversation/:friendUid',
+          child: (_, args) => ConversationPage(friendUid: args.data),
           duration: const Duration(milliseconds: 150),
           transition: TransitionType.fadeIn,
         ),

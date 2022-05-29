@@ -46,4 +46,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-/web/firebase-messaging-ws.js
+/web/firebase-messaging-sw.js
+
+/local/

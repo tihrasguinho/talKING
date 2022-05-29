@@ -20,7 +20,7 @@ extension MessageDto on MessageEntity {
           final timestamp = data['time'] as Timestamp;
 
           return TextMessageEntity(
-            id: data['id'] ?? '',
+            id: doc.id,
             message: data['message'] ?? '',
             from: data['from'] ?? '',
             to: data['to'] ?? '',
@@ -34,7 +34,7 @@ extension MessageDto on MessageEntity {
           final timestamp = data['time'] as Timestamp;
 
           return ImageMessageEntity(
-            id: data['id'] ?? '',
+            id: doc.id,
             image: data['image'] ?? '',
             aspectRatio: data['aspect_ratio'] ?? 1 / 1,
             from: data['from'] ?? '',
@@ -49,7 +49,7 @@ extension MessageDto on MessageEntity {
           final timestamp = data['time'] as Timestamp;
 
           return TextMessageEntity(
-            id: data['id'] ?? '',
+            id: doc.id,
             message: data['message'] ?? '',
             from: data['from'] ?? '',
             to: data['to'] ?? '',
@@ -63,7 +63,7 @@ extension MessageDto on MessageEntity {
           final timestamp = data['time'] as Timestamp;
 
           return TextMessageEntity(
-            id: data['id'] ?? '',
+            id: doc.id,
             message: data['message'] ?? '',
             from: data['from'] ?? '',
             to: data['to'] ?? '',
