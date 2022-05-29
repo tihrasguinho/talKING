@@ -7,67 +7,249 @@ import 'package:talking/src/core/enums/message_type.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
 
 extension MessageDto on MessageEntity {
-  static TextMessageEntity textFromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  // REFACTOR
 
-    final time = data['time'] as Timestamp;
+  static MessageEntity fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data()!;
 
-    return TextMessageEntity(
-      id: doc.id,
-      message: data['message'] ?? '',
-      from: data['from'] ?? '',
-      to: data['to'] ?? '',
-      type: MessageType.values.singleWhere((e) => e.desc == data['type']),
-      time: DateTime.fromMillisecondsSinceEpoch(time.millisecondsSinceEpoch),
-      seen: data['seen'] ?? false,
-    );
+    final type_ = MessageType.values.singleWhere((e) => e.desc == data['type']);
+
+    switch (type_) {
+      case MessageType.text:
+        {
+          final timestamp = data['time'] as Timestamp;
+
+          return TextMessageEntity(
+            id: data['id'] ?? '',
+            message: data['message'] ?? '',
+            from: data['from'] ?? '',
+            to: data['to'] ?? '',
+            type: type_,
+            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            seen: data['seen'] ?? false,
+          );
+        }
+      case MessageType.image:
+        {
+          final timestamp = data['time'] as Timestamp;
+
+          return ImageMessageEntity(
+            id: data['id'] ?? '',
+            image: data['image'] ?? '',
+            aspectRatio: data['aspect_ratio'] ?? 1 / 1,
+            from: data['from'] ?? '',
+            to: data['to'] ?? '',
+            type: type_,
+            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            seen: data['seen'] ?? false,
+          );
+        }
+      case MessageType.audio:
+        {
+          final timestamp = data['time'] as Timestamp;
+
+          return TextMessageEntity(
+            id: data['id'] ?? '',
+            message: data['message'] ?? '',
+            from: data['from'] ?? '',
+            to: data['to'] ?? '',
+            type: type_,
+            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            seen: data['seen'] ?? false,
+          );
+        }
+      case MessageType.video:
+        {
+          final timestamp = data['time'] as Timestamp;
+
+          return TextMessageEntity(
+            id: data['id'] ?? '',
+            message: data['message'] ?? '',
+            from: data['from'] ?? '',
+            to: data['to'] ?? '',
+            type: type_,
+            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            seen: data['seen'] ?? false,
+          );
+        }
+    }
   }
 
-  static TextMessageEntity textFromJson(String source) {
+  static MessageEntity fromMap(Map<String, dynamic> data) {
+    final type_ = MessageType.values.singleWhere((e) => e.desc == data['type']);
+
+    switch (type_) {
+      case MessageType.text:
+        {
+          final timestamp = data['time'] as Timestamp;
+
+          return TextMessageEntity(
+            id: data['id'] ?? '',
+            message: data['message'] ?? '',
+            from: data['from'] ?? '',
+            to: data['to'] ?? '',
+            type: type_,
+            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            seen: data['seen'] ?? false,
+          );
+        }
+      case MessageType.image:
+        {
+          final timestamp = data['time'] as Timestamp;
+
+          return ImageMessageEntity(
+            id: data['id'] ?? '',
+            image: data['image'] ?? '',
+            aspectRatio: data['aspect_ratio'] ?? 1 / 1,
+            from: data['from'] ?? '',
+            to: data['to'] ?? '',
+            type: type_,
+            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            seen: data['seen'] ?? false,
+          );
+        }
+      case MessageType.audio:
+        {
+          final timestamp = data['time'] as Timestamp;
+
+          return TextMessageEntity(
+            id: data['id'] ?? '',
+            message: data['message'] ?? '',
+            from: data['from'] ?? '',
+            to: data['to'] ?? '',
+            type: type_,
+            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            seen: data['seen'] ?? false,
+          );
+        }
+      case MessageType.video:
+        {
+          final timestamp = data['time'] as Timestamp;
+
+          return TextMessageEntity(
+            id: data['id'] ?? '',
+            message: data['message'] ?? '',
+            from: data['from'] ?? '',
+            to: data['to'] ?? '',
+            type: type_,
+            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            seen: data['seen'] ?? false,
+          );
+        }
+    }
+  }
+
+  static MessageEntity fromJson(String source) {
     final data = jsonDecode(source);
 
-    return TextMessageEntity(
-      id: data['id'] ?? '',
-      message: data['message'] ?? '',
-      from: data['from'] ?? '',
-      to: data['to'] ?? '',
-      type: MessageType.text,
-      time: DateTime.parse(data['time']),
-      seen: data['seen'] ?? false,
-    );
+    final type_ = MessageType.values.singleWhere((e) => e.desc == data['type']);
+
+    switch (type_) {
+      case MessageType.text:
+        {
+          final timestamp = data['time'] as Timestamp;
+
+          return TextMessageEntity(
+            id: data['id'] ?? '',
+            message: data['message'] ?? '',
+            from: data['from'] ?? '',
+            to: data['to'] ?? '',
+            type: type_,
+            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            seen: data['seen'] ?? false,
+          );
+        }
+      case MessageType.image:
+        {
+          final timestamp = data['time'] as Timestamp;
+
+          return ImageMessageEntity(
+            id: data['id'] ?? '',
+            image: data['image'] ?? '',
+            aspectRatio: data['aspect_ratio'] ?? 1 / 1,
+            from: data['from'] ?? '',
+            to: data['to'] ?? '',
+            type: type_,
+            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            seen: data['seen'] ?? false,
+          );
+        }
+      case MessageType.audio:
+        {
+          final timestamp = data['time'] as Timestamp;
+
+          return TextMessageEntity(
+            id: data['id'] ?? '',
+            message: data['message'] ?? '',
+            from: data['from'] ?? '',
+            to: data['to'] ?? '',
+            type: type_,
+            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            seen: data['seen'] ?? false,
+          );
+        }
+      case MessageType.video:
+        {
+          final timestamp = data['time'] as Timestamp;
+
+          return TextMessageEntity(
+            id: data['id'] ?? '',
+            message: data['message'] ?? '',
+            from: data['from'] ?? '',
+            to: data['to'] ?? '',
+            type: type_,
+            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            seen: data['seen'] ?? false,
+          );
+        }
+    }
   }
 
-  Map<String, dynamic> textToMap() {
-    final item = this as TextMessageEntity;
+  Map<String, dynamic> toMap() {
+    switch (type) {
+      case MessageType.text:
+        {
+          final item = this as TextMessageEntity;
 
-    return {
-      'id': item.id,
-      'message': item.message,
-      'from': item.from,
-      'to': item.to,
-      'type': item.type.desc,
-      'time': item.time.toIso8601String(),
-    };
+          return {
+            'id': item.id,
+            'message': item.message,
+            'from': item.from,
+            'to': item.to,
+            'type': item.type.desc,
+            'time': item.time.millisecondsSinceEpoch,
+            'seen': item.seen,
+          };
+        }
+      case MessageType.image:
+        {
+          final item = this as ImageMessageEntity;
+
+          return {
+            'id': item.id,
+            'image': item.image,
+            'aspect_ratio': item.aspectRatio,
+            'from': item.from,
+            'to': item.to,
+            'type': item.type.desc,
+            'time': item.time.millisecondsSinceEpoch,
+            'seen': item.seen,
+          };
+        }
+      case MessageType.audio:
+        {
+          return {};
+        }
+      case MessageType.video:
+        {
+          return {};
+        }
+    }
   }
 
-  String textToJson() => jsonEncode(textToMap());
+  String toJson() => jsonEncode(toMap());
 
-  static ImageMessageEntity imageFromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-
-    final time = data['time'] as Timestamp;
-
-    return ImageMessageEntity(
-      id: doc.id,
-      image: data['image'] ?? '',
-      aspectRatio: data['aspect_ratio'] ?? 1 / 1,
-      from: data['from'] ?? '',
-      to: data['to'] ?? '',
-      type: MessageType.values.singleWhere((e) => e.desc == data['type']),
-      time: DateTime.fromMillisecondsSinceEpoch(time.millisecondsSinceEpoch),
-      seen: data['seen'] ?? false,
-    );
-  }
+  // END REFACTOR
 
   String get timeFormatted {
     final formatter = DateFormat('HH:mm');

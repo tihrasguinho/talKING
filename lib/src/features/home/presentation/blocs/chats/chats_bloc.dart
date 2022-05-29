@@ -1,5 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:talking/src/core/data/dtos/app_dtos.dart';
 import 'package:talking/src/features/home/domain/entities/chat_entity.dart';
 import 'package:talking/src/features/home/presentation/blocs/chats/chats_event.dart';
 import 'package:talking/src/features/home/presentation/blocs/chats/chats_state.dart';
@@ -31,6 +32,8 @@ class ChatsBloc {
         filtered.sort((a, b) => b.time.compareTo(a.time));
 
         final unread = filtered.where((e) => e.from == friend && e.seen == false).toList();
+
+        await Hive.box('app').put(friend, filtered.map((e) => e.toJson()).toList());
 
         final chat = ChatEntity(
           friend: friend,

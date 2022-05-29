@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:talking/src/features/home/data/dtos/message_dto.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
@@ -7,7 +8,7 @@ import 'package:talking/src/features/home/presentation/blocs/messages/messages_e
 import 'package:talking/src/features/home/presentation/blocs/messages/messages_state.dart';
 
 class MessagesBloc {
-  final _streamController = BehaviorSubject<MessagesEvent>.seeded(InitialMessagesEvent());
+  final _streamController = BehaviorSubject<MessagesEvent>.seeded(InitialMessagesEvent(''));
 
   void emit(MessagesEvent event) => _streamController.sink.add(event);
 
@@ -19,11 +20,11 @@ class MessagesBloc {
 
       final textsDocs = event.docs.where((e) => e.data()['type'] == 'text').toList();
 
-      final textsMessages = textsDocs.map((e) => MessageDto.textFromFirestore(e)).toList();
+      final textsMessages = textsDocs.map((e) => MessageDto.fromFirestore(e)).toList();
 
       final imagesDocs = event.docs.where((e) => e.data()['type'] == 'image').toList();
 
-      final imagesMessages = imagesDocs.map((e) => MessageDto.imageFromFirestore(e)).toList();
+      final imagesMessages = imagesDocs.map((e) => MessageDto.fromFirestore(e)).toList();
 
       // final audiosDocs = event.docs.where((e) => e.data()['type'] == 'audio').toList();
 
@@ -39,7 +40,13 @@ class MessagesBloc {
 
       yield SuccessMessagesState(messages);
     } else if (event is InitialMessagesEvent) {
-      yield SuccessMessagesState([]);
+      if (event.friendUid.isEmpty) {
+        yield SuccessMessagesState([]);
+      } else {
+        final messages = Hive.box('app').get(event.friendUid) as List<String>;
+
+        yield SuccessMessagesState(messages.map((e) => MessageDto.fromJson(e)).toList());
+      }
     }
   }
 
@@ -47,13 +54,3 @@ class MessagesBloc {
     _streamController.close();
   }
 }
-
-// List<MessageEntity> _filtering(List<MessageEntity> list) {
-//   final data = <String, MessageEntity>{};
-
-//   for (var item in list) {
-//     data[item.id] = item;
-//   }
-
-//   return data.values.toList();
-// }

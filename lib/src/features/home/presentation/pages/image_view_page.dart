@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 class ImageViewPage extends StatefulWidget {
   const ImageViewPage({
@@ -19,15 +20,15 @@ class ImageViewPage extends StatefulWidget {
 class _ImageViewPageState extends State<ImageViewPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: const Text('Image View'),
-      ),
-      body: Center(
-        child: Hero(
-          tag: widget.image,
-          child: widget.isLocal ? Image.file(File(widget.image)) : Image.network(widget.image),
+    return GestureDetector(
+      onTap: () => Modular.to.pop(),
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Hero(
+            tag: widget.image,
+            child: widget.isLocal ? Image.file(File(widget.image)) : Image.network(widget.image),
+          ),
         ),
       ),
     );

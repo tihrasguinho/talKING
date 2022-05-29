@@ -71,10 +71,14 @@ extension UserDto on UserEntity {
 
     final sameYear = date.year == now.year;
 
+    final sameDay = date.day == now.day;
+
     if (difference.inHours < 1) {
       return 'Recent online';
-    } else if (difference.inHours >= 1 && difference.inHours < 24) {
-      return 'Last time online ${hours.format(date)}';
+    } else if (difference.inHours >= 1 && difference.inHours < 24 && sameDay) {
+      return 'Last time online at ${hours.format(date)}';
+    } else if (difference.inHours >= 1 && difference.inHours < 24 && !sameDay) {
+      return 'Last time online yesterday at ${hours.format(date)}';
     } else if (difference.inDays >= 1 && difference.inDays < 2) {
       return 'Last time online yesterday';
     } else if (difference.inDays >= 2 && difference.inDays <= 365) {

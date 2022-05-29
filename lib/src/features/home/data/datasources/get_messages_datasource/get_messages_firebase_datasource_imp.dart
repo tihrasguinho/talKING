@@ -33,9 +33,9 @@ class GetMessagesFirebaseDatasourceImp implements IGetMessagesDatasource {
           .where('to', isEqualTo: uid)
           .get();
 
-      messages.addAll(from.docs.map((e) => MessageDto.textFromFirestore(e)).toList());
+      messages.addAll(from.docs.map((e) => MessageDto.fromFirestore(e)).toList());
 
-      messages.addAll(to.docs.map((e) => MessageDto.textFromFirestore(e)).toList());
+      messages.addAll(to.docs.map((e) => MessageDto.fromFirestore(e)).toList());
 
       return Right(messages);
     } on FirebaseException catch (e) {

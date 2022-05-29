@@ -45,9 +45,9 @@ class MainController {
 
   MessageEntity _firestoreToMessage(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
     if (doc.data()['type'] == 'text') {
-      return MessageDto.textFromFirestore(doc);
+      return MessageDto.fromFirestore(doc);
     } else {
-      return MessageDto.imageFromFirestore(doc);
+      return MessageDto.fromFirestore(doc);
     }
   }
 }

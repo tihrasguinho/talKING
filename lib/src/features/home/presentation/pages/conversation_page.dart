@@ -38,6 +38,10 @@ class _ConversationPageState extends State<ConversationPage> {
 
   final hive = Hive.box('app');
 
+  final emojis = ValueNotifier<bool>(false);
+
+  final attach = ValueNotifier<bool>(false);
+
   late StreamSubscription<List<QueryDocumentSnapshot<Map<String, dynamic>>>> subscription;
 
   void addToSelected(MessageEntity message) {
@@ -55,6 +59,8 @@ class _ConversationPageState extends State<ConversationPage> {
   @override
   void initState() {
     super.initState();
+
+    bloc.emit(InitialMessagesEvent(widget.friend.uid));
 
     input.addListener(() {
       if (input.text.isNotEmpty) {
@@ -74,6 +80,8 @@ class _ConversationPageState extends State<ConversationPage> {
     input.dispose();
     subscription.cancel();
     controller.updateTypingTo('');
+    emojis.dispose();
+    attach.dispose();
     super.dispose();
   }
 
@@ -334,7 +342,7 @@ class _ConversationPageState extends State<ConversationPage> {
             padding: const EdgeInsets.only(
               left: 16.0,
               right: 16.0,
-              bottom: 16.0,
+              bottom: 8.0,
             ),
             child: Ink(
               decoration: BoxDecoration(
@@ -343,6 +351,22 @@ class _ConversationPageState extends State<ConversationPage> {
               ),
               child: Row(
                 children: [
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 250),
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: value,
+                        child: IconButton(
+                          onPressed: () {
+                            attach.value = false;
+                            emojis.value = !emojis.value;
+                          },
+                          icon: const Icon(Icons.emoji_emotions_rounded),
+                        ),
+                      );
+                    },
+                  ),
                   Flexible(
                     child: TextField(
                       controller: input,
@@ -350,150 +374,226 @@ class _ConversationPageState extends State<ConversationPage> {
                             color: Colors.white,
                           ),
                       decoration: const InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
                         filled: false,
                         border: InputBorder.none,
                         hintText: 'Send your message',
                       ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => showModalBottomSheet(
-                      context: context,
-                      backgroundColor: Colors.transparent,
-                      barrierColor: Colors.transparent,
-                      elevation: 0,
-                      builder: (context) {
-                        return Padding(
-                          padding: const EdgeInsets.only(
-                            left: 16.0,
-                            right: 16.0,
-                            bottom: 74.0,
-                          ),
-                          child: Ink(
-                            height: 100.0,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).appBarTheme.backgroundColor,
-                              borderRadius: BorderRadius.circular(16.0),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      onPressed: () async {
-                                        Modular.to.pop();
-
-                                        final params = await controller.pickImage(
-                                          ImageSource.camera,
-                                          widget.friend.uid,
-                                        );
-
-                                        if (params == null) return;
-
-                                        await controller.sendMessage(params);
-                                      },
-                                      icon: const Icon(Icons.camera_alt_rounded),
-                                    ),
-                                    Text(
-                                      'Camera',
-                                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                            color: Colors.white,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      onPressed: () async {
-                                        Modular.to.pop();
-
-                                        final params = await controller.pickImage(
-                                          ImageSource.gallery,
-                                          widget.friend.uid,
-                                        );
-
-                                        if (params == null) return;
-
-                                        await controller.sendMessage(params);
-                                      },
-                                      icon: const Icon(Icons.image_rounded),
-                                    ),
-                                    Text(
-                                      'Galery',
-                                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                            color: Colors.white,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {
-                                        Modular.to.pop();
-                                      },
-                                      icon: const Icon(Icons.audio_file_rounded),
-                                    ),
-                                    Text(
-                                      'Audio',
-                                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                            color: Colors.white,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {
-                                        Modular.to.pop();
-                                      },
-                                      icon: const Icon(Icons.video_file_rounded),
-                                    ),
-                                    Text(
-                                      'Video',
-                                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                            color: Colors.white,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    icon: const Icon(Icons.attach_file_rounded),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      await controller.sendMessage(
-                        SendMessageParams.text(
-                          input.text,
-                          widget.friend.uid,
-                        ),
-                      );
-
-                      input.clear();
+                  AnimatedBuilder(
+                    animation: input,
+                    builder: (context, child) {
+                      return input.text.isNotEmpty
+                          ? const SizedBox()
+                          : TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 0.0, end: 1.0),
+                              duration: const Duration(milliseconds: 250),
+                              builder: (context, value, child) {
+                                return Transform.scale(
+                                  scale: value,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      emojis.value = false;
+                                      attach.value = !attach.value;
+                                    },
+                                    icon: const Icon(Icons.attach_file_rounded),
+                                  ),
+                                );
+                              },
+                            );
                     },
-                    icon: Transform.rotate(
-                      angle: -0.5,
-                      child: const Icon(Icons.send_rounded),
-                    ),
-                  )
+                  ),
+                  AnimatedBuilder(
+                    animation: input,
+                    builder: (context, child) {
+                      return input.text.isEmpty
+                          ? TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 0.0, end: 1.0),
+                              duration: const Duration(milliseconds: 250),
+                              builder: (context, value, child) {
+                                return Transform.scale(
+                                  scale: value,
+                                  child: IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(Icons.mic_rounded),
+                                  ),
+                                );
+                              },
+                            )
+                          : TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 0.0, end: 1.0),
+                              duration: const Duration(milliseconds: 250),
+                              builder: (context, value, child) {
+                                return Transform.scale(
+                                  scale: value,
+                                  child: IconButton(
+                                    onPressed: () async {
+                                      await controller.sendMessage(
+                                        SendMessageParams.text(
+                                          input.text,
+                                          widget.friend.uid,
+                                        ),
+                                      );
+
+                                      input.clear();
+                                    },
+                                    icon: Transform.rotate(
+                                      angle: -0.5,
+                                      child: const Icon(Icons.send_rounded),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                    },
+                  ),
                 ],
               ),
             ),
-          )
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            child: ValueListenableBuilder<bool>(
+              valueListenable: emojis,
+              builder: (context, value, child) {
+                return AnimatedContainer(
+                  height: value ? 256 : 0,
+                  duration: const Duration(milliseconds: 250),
+                  width: double.maxFinite,
+                  margin: EdgeInsets.only(
+                    left: 16.0,
+                    right: 16.0,
+                    bottom: value ? 8.0 : 0.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).appBarTheme.backgroundColor,
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                );
+              },
+            ),
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: attach,
+            builder: (context, value, child) {
+              return AnimatedContainer(
+                clipBehavior: Clip.antiAlias,
+                height: value ? 96 : 0,
+                duration: const Duration(milliseconds: 250),
+                width: double.maxFinite,
+                margin: EdgeInsets.only(
+                  left: 16.0,
+                  right: 16.0,
+                  bottom: value ? 8.0 : 0.0,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).appBarTheme.backgroundColor,
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  clipBehavior: Clip.antiAlias,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 250),
+                    opacity: value ? 1.0 : 0.0,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: () async {
+                                attach.value = !attach.value;
+
+                                final params = await controller.pickImage(
+                                  ImageSource.camera,
+                                  widget.friend.uid,
+                                );
+
+                                if (params == null) return;
+
+                                await controller.sendMessage(params);
+                              },
+                              icon: const Icon(Icons.camera_alt_rounded),
+                            ),
+                            Text(
+                              'Camera',
+                              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                    color: Colors.white,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: () async {
+                                attach.value = !attach.value;
+
+                                final params = await controller.pickImage(
+                                  ImageSource.gallery,
+                                  widget.friend.uid,
+                                );
+
+                                if (params == null) return;
+
+                                await controller.sendMessage(params);
+                              },
+                              icon: const Icon(Icons.image_rounded),
+                            ),
+                            Text(
+                              'Galery',
+                              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                    color: Colors.white,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                attach.value = !attach.value;
+                              },
+                              icon: const Icon(Icons.audio_file_rounded),
+                            ),
+                            Text(
+                              'Audio',
+                              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                    color: Colors.white,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                attach.value = !attach.value;
+                              },
+                              icon: const Icon(Icons.video_file_rounded),
+                            ),
+                            Text(
+                              'Video',
+                              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                    color: Colors.white,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
