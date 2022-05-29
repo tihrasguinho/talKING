@@ -4,9 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:talking/src/core/data/dtos/app_dtos.dart';
 import 'package:talking/src/core/domain/entities/user_entity.dart';
 import 'package:talking/src/core/enums/message_type.dart';
+import 'package:talking/src/core/params/send_message_params.dart';
 import 'package:talking/src/core/utils/app_config.dart';
 import 'package:talking/src/core/widgets/custom_circle_avatar.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
@@ -242,54 +244,65 @@ class _ConversationPageState extends State<ConversationPage> {
                                 ),
                                 child: AspectRatio(
                                   aspectRatio: message.aspectRatio,
-                                  child: Container(
-                                    clipBehavior: Clip.antiAlias,
-                                    decoration: BoxDecoration(
-                                      color: isMe
-                                          ? Theme.of(context).primaryColor
-                                          : Theme.of(context).appBarTheme.backgroundColor,
-                                      borderRadius: BorderRadius.circular(16.0),
+                                  child: GestureDetector(
+                                    onTap: () => Modular.to.pushNamed(
+                                      '/image-view',
+                                      arguments: {
+                                        'image': message.image,
+                                      },
                                     ),
-                                    child: Stack(
-                                      children: [
-                                        Image.network(
-                                          message.image,
-                                          loadingBuilder: (context, child, loadingProgress) {
-                                            if (loadingProgress == null) return child;
-                                            return const Center(child: CircularProgressIndicator());
-                                          },
+                                    child: Hero(
+                                      tag: message.image,
+                                      child: Container(
+                                        clipBehavior: Clip.antiAlias,
+                                        decoration: BoxDecoration(
+                                          color: isMe
+                                              ? Theme.of(context).primaryColor
+                                              : Theme.of(context).appBarTheme.backgroundColor,
+                                          borderRadius: BorderRadius.circular(16.0),
                                         ),
-                                        Align(
-                                          alignment: Alignment.bottomRight,
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 16.0,
-                                              vertical: 8.0,
+                                        child: Stack(
+                                          children: [
+                                            Image.network(
+                                              message.image,
+                                              loadingBuilder: (context, child, loadingProgress) {
+                                                if (loadingProgress == null) return child;
+                                                return const Center(child: CircularProgressIndicator());
+                                              },
                                             ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  message.timeFormatted,
-                                                  style: Theme.of(context).textTheme.overline!.copyWith(
-                                                        color: Colors.white,
-                                                      ),
+                                            Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(
+                                                  horizontal: 16.0,
+                                                  vertical: 8.0,
                                                 ),
-                                                message.isMe ? const SizedBox(width: 4.0) : const SizedBox(),
-                                                message.isMe
-                                                    ? Icon(
-                                                        message.seen
-                                                            ? Icons.check_circle_rounded
-                                                            : Icons.check_circle_outline_rounded,
-                                                        color: message.seen ? Colors.white70 : Colors.white70,
-                                                        size: 16,
-                                                      )
-                                                    : const SizedBox(),
-                                              ],
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      message.timeFormatted,
+                                                      style: Theme.of(context).textTheme.overline!.copyWith(
+                                                            color: Colors.white,
+                                                          ),
+                                                    ),
+                                                    message.isMe ? const SizedBox(width: 4.0) : const SizedBox(),
+                                                    message.isMe
+                                                        ? Icon(
+                                                            message.seen
+                                                                ? Icons.check_circle_rounded
+                                                                : Icons.check_circle_outline_rounded,
+                                                            color: message.seen ? Colors.white70 : Colors.white70,
+                                                            size: 16,
+                                                          )
+                                                        : const SizedBox(),
+                                                  ],
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -345,13 +358,132 @@ class _ConversationPageState extends State<ConversationPage> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => controller.sendImageMessage(widget.friend.uid),
+                    onPressed: () => showModalBottomSheet(
+                      context: context,
+                      backgroundColor: Colors.transparent,
+                      barrierColor: Colors.transparent,
+                      elevation: 0,
+                      builder: (context) {
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                            left: 16.0,
+                            right: 16.0,
+                            bottom: 74.0,
+                          ),
+                          child: Ink(
+                            height: 100.0,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).appBarTheme.backgroundColor,
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () async {
+                                        Modular.to.pop();
+
+                                        final params = await controller.pickImage(
+                                          ImageSource.camera,
+                                          widget.friend.uid,
+                                        );
+
+                                        if (params == null) return;
+
+                                        await controller.sendMessage(params);
+                                      },
+                                      icon: const Icon(Icons.camera_alt_rounded),
+                                    ),
+                                    Text(
+                                      'Camera',
+                                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                            color: Colors.white,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () async {
+                                        Modular.to.pop();
+
+                                        final params = await controller.pickImage(
+                                          ImageSource.gallery,
+                                          widget.friend.uid,
+                                        );
+
+                                        if (params == null) return;
+
+                                        await controller.sendMessage(params);
+                                      },
+                                      icon: const Icon(Icons.image_rounded),
+                                    ),
+                                    Text(
+                                      'Galery',
+                                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                            color: Colors.white,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        Modular.to.pop();
+                                      },
+                                      icon: const Icon(Icons.audio_file_rounded),
+                                    ),
+                                    Text(
+                                      'Audio',
+                                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                            color: Colors.white,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        Modular.to.pop();
+                                      },
+                                      icon: const Icon(Icons.video_file_rounded),
+                                    ),
+                                    Text(
+                                      'Video',
+                                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                            color: Colors.white,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                     icon: const Icon(Icons.attach_file_rounded),
                   ),
                   IconButton(
-                    onPressed: () => {
-                      controller.sendTextMessage(input.text, widget.friend.uid),
-                      input.clear(),
+                    onPressed: () async {
+                      await controller.sendMessage(
+                        SendMessageParams.text(
+                          input.text,
+                          widget.friend.uid,
+                        ),
+                      );
+
+                      input.clear();
                     },
                     icon: Transform.rotate(
                       angle: -0.5,

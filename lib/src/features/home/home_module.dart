@@ -2,6 +2,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:talking/src/core/data/datasources/app_datasources.dart';
 import 'package:talking/src/core/domain/repositories/app_repositories.dart';
 import 'package:talking/src/core/domain/usecases/app_usecases.dart';
+import 'package:talking/src/features/home/presentation/pages/image_view_page.dart';
 
 import 'presentation/blocs/chats/chats_bloc.dart';
 import 'presentation/blocs/current_user/current_user_bloc.dart';
@@ -126,6 +127,14 @@ class HomeModule extends Module {
           '/conversation',
           child: (_, args) => ConversationPage(friend: args.data),
           duration: const Duration(milliseconds: 150),
+          transition: TransitionType.fadeIn,
+        ),
+        ChildRoute(
+          '/image-view',
+          child: (_, args) => ImageViewPage(
+            image: args.data['image'],
+            isLocal: args.data['isLocal'] ?? false,
+          ),
           transition: TransitionType.fadeIn,
         ),
       ];

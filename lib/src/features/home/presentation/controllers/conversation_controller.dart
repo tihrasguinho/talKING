@@ -25,6 +25,8 @@ class ConversationController {
     this._updateTypingToUsecase,
   );
 
+  final picker = ImagePicker();
+
   Future<void> updateTypingTo(String friendUid) async {
     final result = await _updateTypingToUsecase(friendUid);
 
@@ -58,6 +60,49 @@ class ConversationController {
           log(exception.error, name: 'MarkAsSeenException');
         }
       }
+    }
+  }
+
+  Future<SendMessageParams?> pickImage(ImageSource source, String friendUid) async {
+    final pickedFile = await picker.pickImage(source: source);
+
+    if (pickedFile == null) return null;
+
+    final filename = pickedFile.name;
+
+    final sufix = filename.split('.').last.toLowerCase();
+
+    final allowed = ['jpg', 'jpeg', 'png', 'gif'];
+
+    if (!allowed.contains(sufix)) return null;
+
+    final compressed = await FlutterImageCompress.compressWithFile(
+      pickedFile.path,
+      quality: 75,
+      minWidth: 512,
+      minHeight: 512,
+    );
+
+    if (compressed == null) return null;
+
+    final base64 = base64Encode(compressed);
+
+    final image = decodeImage(compressed);
+
+    return SendMessageParams.image(
+      'data:image/$sufix;base64,$base64',
+      image!.width / image.height,
+      friendUid,
+    );
+  }
+
+  Future<void> sendMessage(SendMessageParams params) async {
+    final result = await _sendMessageUsecase(params);
+
+    if (result.isLeft()) {
+      final exception = result.fold((l) => l, (r) => null) as AppException;
+
+      log(exception.error, name: 'SendMessageException');
     }
   }
 
