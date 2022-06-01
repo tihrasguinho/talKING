@@ -27,6 +27,7 @@ exports.notifyNewMessage = functions.firestore.document('cl_messages/{docId}').o
         const payload = {
             notification: JSON.stringify(notification),
             message: JSON.stringify(data),
+            type: 'new_message'
         };
 
         const message = {
@@ -54,18 +55,16 @@ exports.notifyFriendRequest = functions.firestore.document('cl_requests/{docId}'
 
         const notification = {
             title: 'Friend Request',
-            body: `${from.name} sent you a friend request!`
+            body: `${from.name} sent you a friend request!`,
+            image: from.image,
         };
 
-        const data = {
-            sender: snap.from,
-            time: JSON.stringify(snap.created_at)
-        };
+        const data = { 
+            notification: JSON.stringify(notification),
+            type: 'friend_request'
+         };
 
-        const message = {
-            notification,
-            data,
-        };
+        const message = { data };
 
         await messaging.sendToDevice(
             to.token,
@@ -96,18 +95,16 @@ exports.notifyFriendRequestResponse = functions.firestore.document('cl_requests/
 
             const notification = {
                 title: 'Friend Accepted',
-                body: `${to.name} accepted your friend request!`
+                body: `${to.name} accepted your friend request!`,
+                image: to.image,
             };
 
             const data = {
-                sender: after.to,
-                time: JSON.stringify(after.updated_at)
+                notification: JSON.stringify(notification),
+                type: 'friend_accepted'
             };
 
-            const message = {
-                notification,
-                data,
-            };
+            const message = { data };
 
             await messaging.sendToDevice(
                 from.token,

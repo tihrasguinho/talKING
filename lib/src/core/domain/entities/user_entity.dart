@@ -4,20 +4,28 @@ import 'package:hive_flutter/hive_flutter.dart';
 class UserEntity extends HiveObject {
   @HiveField(0)
   final String uid;
+
   @HiveField(1)
   final String name;
+
   @HiveField(2)
   final String username;
+
   @HiveField(3)
   final String email;
+
   @HiveField(4)
   final String image;
+
   @HiveField(5)
   final int createdAt;
+
   @HiveField(6)
   final bool online;
+
   @HiveField(7)
   final int lastConnection;
+
   @HiveField(8)
   final String typingTo;
 
@@ -59,7 +67,7 @@ class UserEntity extends HiveObject {
 
   @override
   String toString() {
-    return 'UserEntity(uid: $uid, name: $name, username: $username, email: $email, image: $image, createdAt: $createdAt, typingTo: $typingTo)';
+    return 'UserEntity(uid: $uid, name: $name, username: $username, email: $email, image: $image, createdAt: $createdAt, online: $online, lastConnection: $lastConnection, typingTo: $typingTo)';
   }
 
   @override

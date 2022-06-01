@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:talking/src/features/home/domain/entities/message_entity.dart';
+import 'package:talking/src/core/domain/entities/app_entities.dart';
 import 'package:talking/src/features/home/presentation/blocs/chats/chats_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/chats/chats_event.dart';
+import 'package:talking/src/features/home/presentation/blocs/friends/friends_bloc.dart';
 import 'package:talking/src/features/home/presentation/controllers/main_controller.dart';
 import 'package:talking/src/features/home/presentation/pages/friends_page.dart';
 
@@ -17,6 +18,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   final MainController controller = Modular.get();
+  final FriendsBloc friendsBloc = Modular.get();
   final ChatsBloc chatsBloc = Modular.get();
 
   int selected = 0;

@@ -42,3 +42,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+scripts:
+  build-apk: flutter clean & flutter pub get & flutter build apk

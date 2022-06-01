@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:talking/src/core/domain/entities/user_entity.dart';
@@ -19,6 +21,8 @@ class FriendsBloc {
 
   Stream<FriendsState> _mapEventToState(FriendsEvent event) async* {
     if (event is FetchFriendsEvent) {
+      log('FetchVriendsEvent', name: 'FriendsBloc');
+
       final result = await _getFriendsUsecase();
 
       if (result.isRight()) {
@@ -35,6 +39,8 @@ class FriendsBloc {
         yield ErrorFriendsState(exception.error);
       }
     } else if (event is InitialFriendsEvent) {
+      log('InitialFriendsEvent', name: 'FriendsBloc');
+
       yield SuccessFriendsState(Hive.box<UserEntity>('friends').values.toList());
     }
   }

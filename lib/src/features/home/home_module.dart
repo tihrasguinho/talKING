@@ -100,7 +100,7 @@ class HomeModule extends Module {
 
         Bind.lazySingleton<ChatsBloc>((i) => ChatsBloc(), onDispose: (bloc) => bloc.dispose()),
 
-        Bind.factory<MainController>((i) => MainController(i())),
+        Bind.factory<MainController>((i) => MainController(i(), i())),
       ];
 
   @override

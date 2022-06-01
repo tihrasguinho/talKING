@@ -1,14 +1,19 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:talking/firebase_options.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:talking/src/core/enums/message_type.dart';
+import 'package:talking/src/core/enums/notification_type.dart';
+import 'package:talking/src/core/params/notification_params.dart';
+import 'package:talking/src/features/home/presentation/blocs/friends/friends_bloc.dart';
+import 'package:talking/src/features/home/presentation/blocs/friends/friends_event.dart';
 
 class NotificationsConfig {
   static final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -62,22 +67,9 @@ class NotificationsConfig {
     FirebaseMessaging.onMessage.listen((message) async {
       log('New Notification', name: 'NotificationsConfig');
 
-      final notification = jsonDecode(message.data['notification']);
+      final params = NotificationParams.fromMap(message.data);
 
-      await flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification['title'] ?? '',
-        notification['body'] ?? '',
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            channelDescription: channel.description,
-            largeIcon: FilePathAndroidBitmap(await _downloadAndSave(notification['image'], 'largeIcon')),
-            styleInformation: await styleWithImage(message),
-          ),
-        ),
-      );
+      await _buildNotification(params);
     });
   }
 
@@ -91,23 +83,9 @@ class NotificationsConfig {
 
     log('New Notification', name: 'NotificationsConfig');
 
-    final notification = jsonDecode(message.data['notification']);
+    final params = NotificationParams.fromMap(message.data);
 
-    final android = jsonDecode(message.data['android']);
-
-    await flutterLocalNotificationsPlugin.show(
-      notification.hashCode,
-      notification['title'] ?? '',
-      notification['body'] ?? '',
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          'high_importance_channel',
-          'High Importance Notifications',
-          channelDescription: 'This channel is used for important notifications.',
-          largeIcon: FilePathAndroidBitmap(await _downloadAndSave(android['imageUrl'], 'largeIcon')),
-        ),
-      ),
-    );
+    await _buildNotification(params);
   }
 
   // Download notification icon
@@ -120,20 +98,117 @@ class NotificationsConfig {
     return filePath;
   }
 
-  // Notification with IMAGE
-  static Future<BigPictureStyleInformation?> styleWithImage(RemoteMessage message) async {
-    final notification = jsonDecode(message.data['notification']);
-    final data = jsonDecode(message.data['message']);
+  static Future<void> _buildNotification(NotificationParams params) async {
+    switch (params.type) {
+      case NotificationType.newMessage:
+        {
+          final type = MessageType.values.firstWhere((e) => e.desc == params.message['type']);
 
-    return data['type'] == 'image'
-        ? BigPictureStyleInformation(
-            FilePathAndroidBitmap(await _downloadAndSave(data['image'], 'bigPicture')),
-            largeIcon: FilePathAndroidBitmap(await _downloadAndSave(notification['image'], 'largeIcon')),
-            contentTitle: notification['title'] ?? '',
-            htmlFormatContentTitle: true,
-            summaryText: 'Sent you a picture',
-            htmlFormatSummaryText: true,
-          )
-        : null;
+          switch (type) {
+            case MessageType.text:
+              {
+                return await flutterLocalNotificationsPlugin.show(
+                  params.hashCode,
+                  params.notification['title'] ?? '',
+                  params.notification['body'] ?? '',
+                  NotificationDetails(
+                    android: AndroidNotificationDetails(
+                      'high_importance_channel',
+                      'High Importance Notifications',
+                      channelDescription: 'This channel is used for important notifications.',
+                      priority: Priority.high,
+                      importance: Importance.max,
+                      largeIcon: params.notification['image'] != ''
+                          ? FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon'))
+                          : null,
+                    ),
+                  ),
+                );
+              }
+            case MessageType.image:
+              {
+                final style = BigPictureStyleInformation(
+                  FilePathAndroidBitmap(await _downloadAndSave(params.message['image'], 'bigPicture')),
+                  largeIcon: FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon')),
+                  contentTitle: params.notification['title'] ?? '',
+                  htmlFormatContentTitle: true,
+                  summaryText: 'Sent you a picture',
+                  htmlFormatSummaryText: true,
+                );
+
+                return await flutterLocalNotificationsPlugin.show(
+                  params.hashCode,
+                  params.notification['title'] ?? '',
+                  params.notification['body'] ?? '',
+                  NotificationDetails(
+                    android: AndroidNotificationDetails(
+                      'high_importance_channel',
+                      'High Importance Notifications',
+                      channelDescription: 'This channel is used for important notifications.',
+                      priority: Priority.high,
+                      importance: Importance.max,
+                      largeIcon: params.notification['image'] != ''
+                          ? FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon'))
+                          : null,
+                      styleInformation: style,
+                    ),
+                  ),
+                );
+              }
+            case MessageType.audio:
+              {
+                break;
+              }
+            case MessageType.video:
+              {
+                break;
+              }
+          }
+
+          break;
+        }
+      case NotificationType.friendRequest:
+        {
+          return await flutterLocalNotificationsPlugin.show(
+            params.hashCode,
+            params.notification['title'] ?? '',
+            params.notification['body'] ?? '',
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                'high_importance_channel',
+                'High Importance Notifications',
+                channelDescription: 'This channel is used for important notifications.',
+                priority: Priority.high,
+                importance: Importance.max,
+                largeIcon: params.notification['image'] != ''
+                    ? FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon'))
+                    : null,
+              ),
+            ),
+          );
+        }
+      case NotificationType.friendAccepted:
+        {
+          Modular.get<FriendsBloc>().emit(FetchFriendsEvent());
+
+          return await flutterLocalNotificationsPlugin.show(
+            params.hashCode,
+            params.notification['title'] ?? '',
+            params.notification['body'] ?? '',
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                'high_importance_channel',
+                'High Importance Notifications',
+                channelDescription: 'This channel is used for important notifications.',
+                priority: Priority.high,
+                importance: Importance.max,
+                largeIcon: params.notification['image'] != ''
+                    ? FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon'))
+                    : null,
+              ),
+            ),
+          );
+        }
+    }
   }
 }

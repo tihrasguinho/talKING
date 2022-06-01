@@ -63,7 +63,7 @@ class _FriendsPageState extends State<FriendsPage> {
                   trailing: IconButton(
                     onPressed: () => {
                       Modular.to.pop(),
-                      Modular.to.pushNamed('/conversation', arguments: user),
+                      Modular.to.pushNamed('/conversation', arguments: user.uid),
                     },
                     icon: Transform.rotate(
                       angle: -0.5,
