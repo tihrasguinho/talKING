@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -214,7 +215,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                         child: Container(
                                           key: ValueKey(message.id),
                                           margin: const EdgeInsets.symmetric(
-                                            horizontal: 24.0,
+                                            horizontal: 16.0,
                                             vertical: 4.0,
                                           ),
                                           padding: const EdgeInsets.only(
@@ -274,7 +275,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                   return Container(
                                     margin: selecteds.contains(message)
                                         ? const EdgeInsets.symmetric(
-                                            vertical: .5,
+                                            vertical: 0.5,
                                           )
                                         : null,
                                     color: selecteds.contains(message)
@@ -284,8 +285,8 @@ class _ConversationPageState extends State<ConversationPage> {
                                       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                                       child: Padding(
                                         padding: EdgeInsets.only(
-                                          right: isMe ? 24.0 : config.size.width * 0.5,
-                                          left: isMe ? config.size.width * 0.5 : 24.0,
+                                          right: isMe ? 16.0 : config.size.width * 0.25,
+                                          left: isMe ? config.size.width * 0.25 : 16.0,
                                           top: 4.0,
                                           bottom: 4.0,
                                         ),
@@ -311,11 +312,15 @@ class _ConversationPageState extends State<ConversationPage> {
                                                 ),
                                                 child: Stack(
                                                   children: [
-                                                    Image.network(
-                                                      message.image,
-                                                      loadingBuilder: (context, child, loadingProgress) {
-                                                        if (loadingProgress == null) return child;
-                                                        return const Center(child: CircularProgressIndicator());
+                                                    CachedNetworkImage(
+                                                      imageUrl: message.image,
+                                                      maxWidthDiskCache: (config.size.width * 0.75).round(),
+                                                      progressIndicatorBuilder: (context, str, progress) {
+                                                        return Center(
+                                                          child: CircularProgressIndicator(
+                                                            value: progress.progress,
+                                                          ),
+                                                        );
                                                       },
                                                     ),
                                                     Align(
@@ -524,7 +529,8 @@ class _ConversationPageState extends State<ConversationPage> {
                   builder: (context, value, child) {
                     return AnimatedContainer(
                       clipBehavior: Clip.antiAlias,
-                      height: value ? 96 : 0,
+                      height: value ? 75 : 0,
+                      curve: Curves.easeInOut,
                       duration: const Duration(milliseconds: 250),
                       width: double.maxFinite,
                       margin: EdgeInsets.only(
@@ -536,105 +542,119 @@ class _ConversationPageState extends State<ConversationPage> {
                         color: Theme.of(context).appBarTheme.backgroundColor,
                         borderRadius: BorderRadius.circular(16.0),
                       ),
-                      child: Material(
-                        color: Colors.transparent,
-                        clipBehavior: Clip.antiAlias,
-                        child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 250),
-                          opacity: value ? 1.0 : 0.0,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    onPressed: () async {
-                                      attach.value = !attach.value;
+                      child: Column(
+                        children: [
+                          Material(
+                            color: Colors.transparent,
+                            clipBehavior: Clip.antiAlias,
+                            child: FutureBuilder(
+                              future: Future.delayed(const Duration(milliseconds: 250)),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const SizedBox();
+                                } else {
+                                  return AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 250),
+                                    curve: Curves.easeIn,
+                                    opacity: value ? 1.0 : 0.0,
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              onPressed: () async {
+                                                attach.value = !attach.value;
 
-                                      final params = await controller.pickImage(
-                                        ImageSource.camera,
-                                        friend.uid,
-                                      );
+                                                final params = await controller.pickImage(
+                                                  ImageSource.camera,
+                                                  friend.uid,
+                                                );
 
-                                      if (params == null) return;
+                                                if (params == null) return;
 
-                                      await controller.sendMessage(params);
-                                    },
-                                    icon: const Icon(Icons.camera_alt_rounded),
-                                  ),
-                                  Text(
-                                    'Camera',
-                                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                          color: Colors.white,
+                                                await controller.sendMessage(params);
+                                              },
+                                              icon: const Icon(Icons.camera_alt_rounded),
+                                            ),
+                                            Text(
+                                              'Camera',
+                                              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                                    color: Colors.white,
+                                                  ),
+                                            ),
+                                          ],
                                         ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    onPressed: () async {
-                                      attach.value = !attach.value;
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              onPressed: () async {
+                                                attach.value = !attach.value;
 
-                                      final params = await controller.pickImage(
-                                        ImageSource.gallery,
-                                        friend.uid,
-                                      );
+                                                final params = await controller.pickImage(
+                                                  ImageSource.gallery,
+                                                  friend.uid,
+                                                );
 
-                                      if (params == null) return;
+                                                if (params == null) return;
 
-                                      await controller.sendMessage(params);
-                                    },
-                                    icon: const Icon(Icons.image_rounded),
-                                  ),
-                                  Text(
-                                    'Galery',
-                                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                          color: Colors.white,
+                                                await controller.sendMessage(params);
+                                              },
+                                              icon: const Icon(Icons.image_rounded),
+                                            ),
+                                            Text(
+                                              'Galery',
+                                              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                                    color: Colors.white,
+                                                  ),
+                                            ),
+                                          ],
                                         ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      attach.value = !attach.value;
-                                    },
-                                    icon: const Icon(Icons.audio_file_rounded),
-                                  ),
-                                  Text(
-                                    'Audio',
-                                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                          color: Colors.white,
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              onPressed: () {
+                                                attach.value = !attach.value;
+                                              },
+                                              icon: const Icon(Icons.audio_file_rounded),
+                                            ),
+                                            Text(
+                                              'Audio',
+                                              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                                    color: Colors.white,
+                                                  ),
+                                            ),
+                                          ],
                                         ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      attach.value = !attach.value;
-                                    },
-                                    icon: const Icon(Icons.video_file_rounded),
-                                  ),
-                                  Text(
-                                    'Video',
-                                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                          color: Colors.white,
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              onPressed: () {
+                                                attach.value = !attach.value;
+                                              },
+                                              icon: const Icon(Icons.video_file_rounded),
+                                            ),
+                                            Text(
+                                              'Video',
+                                              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                                                    color: Colors.white,
+                                                  ),
+                                            ),
+                                          ],
                                         ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                      ],
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     );
                   },

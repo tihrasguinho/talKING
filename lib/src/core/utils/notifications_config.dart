@@ -74,7 +74,20 @@ class NotificationsConfig {
   }
 
   // On Select Notification
-  static Future<void> _onSelectnotification(String? payload) async {}
+  static Future<void> _onSelectnotification(String? payload) async {
+    final split = payload?.split(':') ?? [];
+
+    if (split.length == 2) {
+      if (split.first == 'new_message') {
+        Modular.to.pushNamed(
+          '/conversation/${split.last}',
+          arguments: split.last,
+        );
+
+        return;
+      }
+    }
+  }
 
   static Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     await Firebase.initializeApp(
@@ -102,6 +115,12 @@ class NotificationsConfig {
     switch (params.type) {
       case NotificationType.newMessage:
         {
+          final path = Modular.to.path;
+
+          if (path == '/conversation/${params.message['from']}') {
+            return;
+          }
+
           final type = MessageType.values.firstWhere((e) => e.desc == params.message['type']);
 
           switch (type) {
@@ -123,6 +142,7 @@ class NotificationsConfig {
                           : null,
                     ),
                   ),
+                  payload: 'new_message:${params.message['from']}',
                 );
               }
             case MessageType.image:
@@ -153,6 +173,7 @@ class NotificationsConfig {
                       styleInformation: style,
                     ),
                   ),
+                  payload: 'new_message:${params.message['from']}',
                 );
               }
             case MessageType.audio:

@@ -7,8 +7,6 @@ import 'package:talking/src/core/enums/message_type.dart';
 import 'package:talking/src/features/home/domain/entities/message_entity.dart';
 
 extension MessageDto on MessageEntity {
-  // REFACTOR
-
   static MessageEntity fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
 
@@ -147,22 +145,18 @@ extension MessageDto on MessageEntity {
     switch (type_) {
       case MessageType.text:
         {
-          final timestamp = data['time'] as Timestamp;
-
           return TextMessageEntity(
             id: data['id'] ?? '',
             message: data['message'] ?? '',
             from: data['from'] ?? '',
             to: data['to'] ?? '',
             type: type_,
-            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            time: DateTime.fromMillisecondsSinceEpoch(data['time']),
             seen: data['seen'] ?? false,
           );
         }
       case MessageType.image:
         {
-          final timestamp = data['time'] as Timestamp;
-
           return ImageMessageEntity(
             id: data['id'] ?? '',
             image: data['image'] ?? '',
@@ -170,7 +164,7 @@ extension MessageDto on MessageEntity {
             from: data['from'] ?? '',
             to: data['to'] ?? '',
             type: type_,
-            time: DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch),
+            time: DateTime.fromMillisecondsSinceEpoch(data['time']),
             seen: data['seen'] ?? false,
           );
         }
@@ -248,8 +242,6 @@ extension MessageDto on MessageEntity {
   }
 
   String toJson() => jsonEncode(toMap());
-
-  // END REFACTOR
 
   String get timeFormatted {
     final formatter = DateFormat('HH:mm');

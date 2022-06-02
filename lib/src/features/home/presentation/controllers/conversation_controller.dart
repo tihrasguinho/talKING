@@ -106,59 +106,6 @@ class ConversationController {
     }
   }
 
-  Future<void> sendTextMessage(String message, String friendUid) async {
-    final result = await _sendMessageUsecase(SendMessageParams.text(message, friendUid));
-
-    if (result.isLeft()) {
-      final exception = result.fold((l) => l, (r) => null) as AppException;
-
-      log(exception.error, name: 'SendMessageException');
-    }
-  }
-
-  Future<void> sendImageMessage(String friendUid) async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-
-    if (pickedFile == null) return;
-
-    final filename = pickedFile.name;
-
-    final sufix = filename.split('.').last.toLowerCase();
-
-    final allowed = ['jpg', 'jpeg', 'png', 'gif'];
-
-    if (!allowed.contains(sufix)) return;
-
-    final compressed = await FlutterImageCompress.compressWithFile(
-      pickedFile.path,
-      quality: 75,
-      minWidth: 512,
-      minHeight: 512,
-    );
-
-    if (compressed == null) return;
-
-    final base64 = base64Encode(compressed);
-
-    final image = decodeImage(compressed);
-
-    final result = await _sendMessageUsecase(
-      SendMessageParams.image(
-        'data:image/$sufix;base64,$base64',
-        image!.width / image.height,
-        friendUid,
-      ),
-    );
-
-    if (result.isRight()) {
-      result.fold((l) => null, (r) => r) as ImageMessageEntity;
-    } else {
-      final exception = result.fold((l) => l, (r) => null) as AppException;
-
-      log(exception.error, name: 'SendMessageException');
-    }
-  }
-
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> stream(String userUid, String friendUid) {
     final firestore = FirebaseFirestore.instance;
 

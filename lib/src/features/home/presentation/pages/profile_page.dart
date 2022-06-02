@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:talking/src/core/domain/entities/app_entities.dart';
 import 'package:talking/src/core/widgets/custom_circle_avatar.dart';
 import 'package:talking/src/features/home/presentation/blocs/current_user/current_user_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/current_user/current_user_state.dart';
@@ -101,11 +104,19 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
-      // floatingActionButton: FloatingActionButton.extended(
-      //   onPressed: () {},
-      //   icon: Icon(Icons.person_add_rounded),
-      //   label: Text('Add Friend'),
-      // ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          await FirebaseAuth.instance.signOut();
+
+          await Hive.box('app').clear();
+
+          await Hive.box<UserEntity>('friends').clear();
+
+          Modular.to.navigate('/');
+        },
+        icon: const Icon(Icons.exit_to_app),
+        label: const Text('LogOut'),
+      ),
     );
   }
 }

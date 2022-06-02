@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:talking/src/core/domain/entities/user_entity.dart';
 
@@ -26,7 +27,11 @@ class CustomCircleAvatar extends StatelessWidget {
         image: user.image.isEmpty
             ? null
             : DecorationImage(
-                image: NetworkImage(user.image),
+                image: CachedNetworkImageProvider(
+                  user.image,
+                  maxWidth: size.width.round() * 2,
+                  maxHeight: size.height.round() * 2,
+                ),
                 fit: BoxFit.cover,
               ),
       ),

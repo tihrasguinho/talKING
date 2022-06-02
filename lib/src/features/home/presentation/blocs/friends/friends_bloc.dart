@@ -11,7 +11,7 @@ import 'package:talking/src/features/home/presentation/blocs/friends/friends_sta
 class FriendsBloc {
   final IGetFriendsUsecase _getFriendsUsecase;
 
-  final _controller = BehaviorSubject<FriendsEvent>.seeded(InitialFriendsEvent());
+  final _controller = BehaviorSubject<FriendsEvent>.seeded(FetchFriendsEvent());
 
   FriendsBloc(this._getFriendsUsecase);
 
@@ -21,7 +21,7 @@ class FriendsBloc {
 
   Stream<FriendsState> _mapEventToState(FriendsEvent event) async* {
     if (event is FetchFriendsEvent) {
-      log('FetchVriendsEvent', name: 'FriendsBloc');
+      log('FetchFriendsEvent', name: 'FriendsBloc');
 
       final result = await _getFriendsUsecase();
 

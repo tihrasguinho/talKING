@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -6,6 +7,7 @@ import 'package:talking/src/core/domain/entities/app_entities.dart';
 import 'package:talking/src/features/home/presentation/blocs/chats/chats_bloc.dart';
 import 'package:talking/src/features/home/presentation/blocs/chats/chats_event.dart';
 import 'package:talking/src/features/home/presentation/blocs/friends/friends_bloc.dart';
+import 'package:talking/src/features/home/presentation/blocs/friends/friends_event.dart';
 import 'package:talking/src/features/home/presentation/controllers/main_controller.dart';
 import 'package:talking/src/features/home/presentation/pages/friends_page.dart';
 
@@ -48,7 +50,13 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addObserver(this);
 
+    Modular.to.addListener(() {
+      log('Atual path: ${Modular.to.path}', name: 'path');
+    });
+
     controller.updateOnlineStatus(AppLifecycleState.resumed);
+
+    friendsBloc.emit(FetchFriendsEvent());
 
     subscription = controller.stream().listen((messages) {
       chatsBloc.emit(LoadChatsEvent(messages));

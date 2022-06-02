@@ -43,7 +43,9 @@ class MessagesBloc {
       if (event.friendUid.isEmpty) {
         yield SuccessMessagesState([]);
       } else {
-        final messages = Hive.box('app').get(event.friendUid) as List<String>;
+        final messages = Hive.box('app').containsKey(event.friendUid)
+            ? Hive.box('app').get(event.friendUid) as List<String>
+            : <String>[];
 
         yield SuccessMessagesState(messages.map((e) => MessageDto.fromJson(e)).toList());
       }

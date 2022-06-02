@@ -19,7 +19,7 @@ class SigninController {
 
       log(user.toString(), name: 'signInSuccess');
 
-      return Modular.to.navigate('/');
+      return Modular.to.navigate('/chats');
     } else {
       final exception = result.fold((l) => l, (r) => null) as AppException;
 

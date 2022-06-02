@@ -50,7 +50,7 @@ class HomeModule extends Module {
         Bind.lazySingleton<IGetFriendsDatasource>((i) => GetFriendsFirebaseDatasourceImp()),
         Bind.lazySingleton<IGetFriendsRepository>((i) => GetFriendsRepositoryImp(i())),
         Bind.lazySingleton<IGetFriendsUsecase>((i) => GetFriendsUsecaseImp(i())),
-        Bind.singleton<FriendsBloc>((i) => FriendsBloc(i()), onDispose: (bloc) => bloc.dispose()),
+        Bind.lazySingleton<FriendsBloc>((i) => FriendsBloc(i()), onDispose: (bloc) => bloc.dispose()),
 
         // Send Message
 
