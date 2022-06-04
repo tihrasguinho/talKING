@@ -16,28 +16,32 @@ class MainWidget extends StatelessWidget {
     Modular.setNavigatorKey(navigatorKey);
     Modular.setInitialRoute('/chats');
 
-    return LayoutBuilder(builder: (context, constraints) {
-      // Set the device screen size
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Set the device screen size
 
-      config.setSize(Size(constraints.maxWidth, constraints.maxHeight));
+        config.setSize(Size(constraints.maxWidth, constraints.maxHeight));
 
-      return MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        title: 'talKING',
-        routeInformationParser: Modular.routeInformationParser,
-        routerDelegate: Modular.routerDelegate,
-        theme: FlexThemeData.dark(
-          colorScheme: AppConsts.flexSchemeDark,
-          textTheme: GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme),
-          appBarBackground: const Color(0xFF242424),
-        ),
-        darkTheme: FlexThemeData.dark(
-          colorScheme: AppConsts.flexSchemeDark,
-          textTheme: GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme),
-          appBarBackground: const Color(0xFF242424),
-        ),
-        themeMode: ThemeMode.dark,
-      );
-    });
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          title: 'talKING',
+          routeInformationParser: Modular.routeInformationParser,
+          routerDelegate: Modular.routerDelegate,
+          theme: FlexThemeData.dark(
+            colorScheme: AppConsts.flexSchemeDark,
+            textTheme:
+                GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme),
+            appBarBackground: const Color(0xFF242424),
+          ),
+          darkTheme: FlexThemeData.dark(
+            colorScheme: AppConsts.flexSchemeDark,
+            textTheme:
+                GoogleFonts.notoSansTextTheme(Theme.of(context).textTheme),
+            appBarBackground: const Color(0xFF242424),
+          ),
+          themeMode: ThemeMode.dark,
+        );
+      },
+    );
   }
 }

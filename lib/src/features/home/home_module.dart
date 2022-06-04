@@ -2,6 +2,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:talking/src/core/data/datasources/app_datasources.dart';
 import 'package:talking/src/core/domain/repositories/app_repositories.dart';
 import 'package:talking/src/core/domain/usecases/app_usecases.dart';
+import 'package:talking/src/features/home/presentation/pages/friend_page.dart';
 import 'package:talking/src/features/home/presentation/pages/image_view_page.dart';
 
 import 'presentation/blocs/chats/chats_bloc.dart';
@@ -122,6 +123,12 @@ class HomeModule extends Module {
           child: (_, __) => const SearchPage(),
           duration: const Duration(milliseconds: 150),
           transition: TransitionType.rightToLeftWithFade,
+        ),
+        ChildRoute(
+          '/friend/:friendUid',
+          child: (_, args) => FriendPage(friendUid: args.data),
+          duration: const Duration(milliseconds: 150),
+          transition: TransitionType.fadeIn,
         ),
         ChildRoute(
           '/conversation/:friendUid',

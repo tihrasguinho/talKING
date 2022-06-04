@@ -111,6 +111,10 @@ class _ConversationPageState extends State<ConversationPage> {
                   CustomCircleAvatar(
                     user: friend,
                     size: const Size(32, 32),
+                    onTap: () => Modular.to.pushNamed(
+                      '/friend/${widget.friendUid}',
+                      arguments: widget.friendUid,
+                    ),
                   ),
                   const SizedBox(width: 8.0),
                   Column(
@@ -205,9 +209,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                             vertical: .5,
                                           )
                                         : null,
-                                    color: selecteds.contains(message)
-                                        ? Theme.of(context).primaryColorLight.withOpacity(0.3)
-                                        : Colors.transparent,
+                                    color: selecteds.contains(message) ? Theme.of(context).primaryColorLight.withOpacity(0.3) : Colors.transparent,
                                     child: Align(
                                       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                                       child: GestureDetector(
@@ -225,9 +227,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                             bottom: 8.0,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: isMe
-                                                ? Theme.of(context).primaryColor
-                                                : Theme.of(context).appBarTheme.backgroundColor,
+                                            color: isMe ? Theme.of(context).primaryColor : Theme.of(context).appBarTheme.backgroundColor,
                                             borderRadius: BorderRadius.circular(16.0),
                                           ),
                                           child: Column(
@@ -252,9 +252,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                                   message.isMe ? const SizedBox(width: 4.0) : const SizedBox(),
                                                   message.isMe
                                                       ? Icon(
-                                                          message.seen
-                                                              ? Icons.check_circle_rounded
-                                                              : Icons.check_circle_outline_rounded,
+                                                          message.seen ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
                                                           color: message.seen ? Colors.white70 : Colors.white70,
                                                           size: 16,
                                                         )
@@ -278,9 +276,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                             vertical: 0.5,
                                           )
                                         : null,
-                                    color: selecteds.contains(message)
-                                        ? Theme.of(context).primaryColorLight.withOpacity(0.3)
-                                        : Colors.transparent,
+                                    color: selecteds.contains(message) ? Theme.of(context).primaryColorLight.withOpacity(0.3) : Colors.transparent,
                                     child: Align(
                                       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                                       child: Padding(
@@ -305,16 +301,14 @@ class _ConversationPageState extends State<ConversationPage> {
                                               child: Container(
                                                 clipBehavior: Clip.antiAlias,
                                                 decoration: BoxDecoration(
-                                                  color: isMe
-                                                      ? Theme.of(context).primaryColor
-                                                      : Theme.of(context).appBarTheme.backgroundColor,
+                                                  color: isMe ? Theme.of(context).primaryColor : Theme.of(context).appBarTheme.backgroundColor,
                                                   borderRadius: BorderRadius.circular(16.0),
                                                 ),
                                                 child: Stack(
                                                   children: [
                                                     CachedNetworkImage(
                                                       imageUrl: message.image,
-                                                      maxWidthDiskCache: (config.size.width * 0.75).round(),
+                                                      maxWidthDiskCache: config.size.width.round(),
                                                       progressIndicatorBuilder: (context, str, progress) {
                                                         return Center(
                                                           child: CircularProgressIndicator(
@@ -339,16 +333,11 @@ class _ConversationPageState extends State<ConversationPage> {
                                                                     color: Colors.white,
                                                                   ),
                                                             ),
-                                                            message.isMe
-                                                                ? const SizedBox(width: 4.0)
-                                                                : const SizedBox(),
+                                                            message.isMe ? const SizedBox(width: 4.0) : const SizedBox(),
                                                             message.isMe
                                                                 ? Icon(
-                                                                    message.seen
-                                                                        ? Icons.check_circle_rounded
-                                                                        : Icons.check_circle_outline_rounded,
-                                                                    color:
-                                                                        message.seen ? Colors.white70 : Colors.white70,
+                                                                    message.seen ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
+                                                                    color: message.seen ? Colors.white70 : Colors.white70,
                                                                     size: 16,
                                                                   )
                                                                 : const SizedBox(),
