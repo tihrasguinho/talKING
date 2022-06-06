@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:talking/src/core/domain/entities/app_entities.dart';
@@ -44,6 +45,8 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
 
   late StreamSubscription<List<MessageEntity>> subscription;
 
+  late StreamSubscription<List<QueryDocumentSnapshot>> groups;
+
   @override
   void initState() {
     super.initState();
@@ -61,11 +64,17 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     subscription = controller.stream().listen((messages) {
       chatsBloc.emit(LoadChatsEvent(messages));
     });
+
+    groups = controller.groupsStream().listen((event) {
+      log(event.length.toString());
+    });
   }
 
   @override
   void dispose() {
     subscription.cancel();
+
+    groups.cancel();
 
     WidgetsBinding.instance.removeObserver(this);
 

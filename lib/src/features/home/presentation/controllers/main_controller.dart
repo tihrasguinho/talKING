@@ -32,18 +32,29 @@ class MainController {
     }
   }
 
+  Stream<List<QueryDocumentSnapshot>> groupsStream() {
+    final uid = hive.get('uid');
+
+    final groups = firestore.collection('cl_messages').where('users', arrayContains: uid).snapshots();
+
+    return groups.map((event) => event.docs);
+  }
+
   Stream<List<MessageEntity>> stream() {
     final uid = hive.get('uid');
 
-    final from = FirebaseFirestore.instance.collection('cl_messages').where('from', isEqualTo: uid).snapshots();
+    final from = firestore.collection('cl_messages').where('from', isEqualTo: uid).snapshots();
 
-    final to = FirebaseFirestore.instance.collection('cl_messages').where('to', isEqualTo: uid).snapshots();
+    final to = firestore.collection('cl_messages').where('to', isEqualTo: uid).snapshots();
 
-    return Rx.combineLatest2<QuerySnapshot<Map<String, dynamic>>, QuerySnapshot<Map<String, dynamic>>,
-        List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
+    return Rx.combineLatest2<QuerySnapshot<Map<String, dynamic>>, QuerySnapshot<Map<String, dynamic>>, List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
       from,
       to,
-      (a, b) => [...a.docs, ...b.docs],
+      (
+        a,
+        b,
+      ) =>
+          [...a.docs, ...b.docs],
     ).asyncMap((event) => event.map(_firestoreToMessage).toList());
   }
 
