@@ -12,8 +12,6 @@ import 'package:http/http.dart' as http;
 import 'package:talking/src/core/enums/message_type.dart';
 import 'package:talking/src/core/enums/notification_type.dart';
 import 'package:talking/src/core/params/notification_params.dart';
-import 'package:talking/src/features/home/presentation/blocs/friends/friends_bloc.dart';
-import 'package:talking/src/features/home/presentation/blocs/friends/friends_event.dart';
 
 class NotificationsConfig {
   static final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -58,9 +56,7 @@ class NotificationsConfig {
       onSelectNotification: _onSelectnotification,
     );
 
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
+    await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) {});
 
@@ -137,9 +133,7 @@ class NotificationsConfig {
                       channelDescription: 'This channel is used for important notifications.',
                       priority: Priority.high,
                       importance: Importance.max,
-                      largeIcon: params.notification['image'] != ''
-                          ? FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon'))
-                          : null,
+                      largeIcon: params.notification['image'] != '' ? FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon')) : null,
                     ),
                   ),
                   payload: 'new_message:${params.message['from']}',
@@ -167,9 +161,7 @@ class NotificationsConfig {
                       channelDescription: 'This channel is used for important notifications.',
                       priority: Priority.high,
                       importance: Importance.max,
-                      largeIcon: params.notification['image'] != ''
-                          ? FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon'))
-                          : null,
+                      largeIcon: params.notification['image'] != '' ? FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon')) : null,
                       styleInformation: style,
                     ),
                   ),
@@ -201,17 +193,13 @@ class NotificationsConfig {
                 channelDescription: 'This channel is used for important notifications.',
                 priority: Priority.high,
                 importance: Importance.max,
-                largeIcon: params.notification['image'] != ''
-                    ? FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon'))
-                    : null,
+                largeIcon: params.notification['image'] != '' ? FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon')) : null,
               ),
             ),
           );
         }
       case NotificationType.friendAccepted:
         {
-          Modular.get<FriendsBloc>().emit(FetchFriendsEvent());
-
           return await flutterLocalNotificationsPlugin.show(
             params.hashCode,
             params.notification['title'] ?? '',
@@ -223,9 +211,7 @@ class NotificationsConfig {
                 channelDescription: 'This channel is used for important notifications.',
                 priority: Priority.high,
                 importance: Importance.max,
-                largeIcon: params.notification['image'] != ''
-                    ? FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon'))
-                    : null,
+                largeIcon: params.notification['image'] != '' ? FilePathAndroidBitmap(await _downloadAndSave(params.notification['image'], 'largeIcon')) : null,
               ),
             ),
           );
